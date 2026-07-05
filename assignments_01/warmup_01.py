@@ -25,7 +25,7 @@ print(f"Shape: {df.shape}")
 print(f"Data types of each column: {df.dtypes}")
 
 # --- Pandas Q2 ---
-filtered_df = df.loc[ (df['passed']) & (df['grade'] > 80), ['name', 'grade'] ]
+filtered_df = df.loc[ (df['passed']) & (df['grade'] > 80) ]
 print(f"Students who passed and have grade > 80:\n {filtered_df}")
 
 # --- Pandas Q3 ---
@@ -35,7 +35,7 @@ print(f"DataFrame with curved grades:\n {df2}")
 
 # --- Pandas Q4 ---
 df2['name_upper'] = df2['name'].str.upper()
-print(f"DataFrame with uppercase names:\n {df2}")
+print(f"DataFrame with name and uppercase names:\n {df2[['name', 'name_upper']]}")
 
 # --- Pandas Q5 ---
 average_grades = df2.groupby('city')['grade'].mean().reset_index()
