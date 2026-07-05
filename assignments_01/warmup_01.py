@@ -51,7 +51,7 @@ print(f"Top 3 students by grade:\n {top_students}")
 
 # --- NumPy Review ---
 # --- NumPy Q1 ---
-arr = np.array([[10, 20, 30, 40, 50]])
+arr = np.array([10, 20, 30, 40, 50])
 print(f"shape of the array {arr.shape}")
 print(f"array type: {arr.dtype}")
 print(f"number of dimensions (ndim): {arr.ndim}")
@@ -60,8 +60,8 @@ print(f"number of dimensions (ndim): {arr.ndim}")
 arr = np.array([[1, 2, 3],
                 [4, 5, 6],
                 [7, 8, 9]])
-print(f"length of the array: {len(arr)}")
-print(f"shape of the array {arr.shape}")
+print(f"Shape of the array {arr.shape}")
+print(f"Size of the array: {arr.size}")
 
 # --- NumPy Q3 ---
 arr_reshaped = arr[0:2, 0:2]
@@ -104,6 +104,8 @@ subjects = ["Math", "Science", "English", "History"]
 scores   = [88, 92, 75, 83]
 plt.bar(subjects, scores)
 plt.title('Subject Scores')
+plt.xlabel('Subjects')
+plt.ylabel('Scores')
 plt.show()
 
 # --- Matplotlib Q3 ---
@@ -244,9 +246,10 @@ print(f"Correlation coefficient: {correlation}")
 # --- Correlation Q2 ---
 x = [1,  2,  3,  4,  5,  6,  7,  8,  9, 10]
 y = [10, 9,  7,  8,  6,  5,  3,  4,  2,  1]
-corr_matrix = pearsonr(x, y)
-print(f"Correlation coefficient: {corr_matrix.statistic}")
-print(f"Correlation p-value: {corr_matrix.pvalue}")
+coef, p = pearsonr(x, y)
+
+print(f"Correlation coefficient: {coef}")
+print(f"Correlation p-value: {p}")
 
 # --- Correlation Q3 ---
 people = {

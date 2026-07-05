@@ -51,6 +51,8 @@ def clean_columns(df):
     logger = get_run_logger()
     logger.info('Cleaning columns names...')
     df.columns= (df.columns.str.strip().str.lower().str.replace(' ', '_'))
+    if 'happiness_score' not in df.columns:
+        df['happiness_score'] = df['ladder_score']
     if 'ladder_score' in df.columns and 'happiness_score' in df.columns:
         df['happiness_score'] = df['happiness_score'].fillna(df['ladder_score'])
         df = df.drop(columns=['ladder_score'])
