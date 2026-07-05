@@ -5,7 +5,7 @@ import seaborn as sns
 from scipy import stats
 from scipy.stats import pearsonr
 from prefect import task, flow
-from prefect.logging import get_run_logger
+from prefect import get_run_logger
 import os
 
 
