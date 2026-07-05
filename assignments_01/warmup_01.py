@@ -187,8 +187,15 @@ plt.show()
 # --- Descriptive Statistics Q5 ---
 data1 = [10, 12, 12, 16, 18]
 data2 = [10, 12, 12, 16, 150]
-print(f"Data - 1: Mean: {np.mean(data1)}, Median: {np.median(data1)}")
-print(f"Data - 2: Mean: {np.mean(data2)}, Median: {np.median(data2)}")
+data1_mean = np.mean(data1)
+data2_mean = np.mean(data2)
+data1_median = np.median(data1)
+data2_median = np.median(data2)
+mode_data1 = pd.Series(data1).mode()[0]
+mode_data2 = pd.Series(data2).mode()[0]
+
+print(f"Data - 1: Mean: {data1_mean}, Median: {data1_median}, Mode: {mode_data1}")
+print(f"Data - 2: Mean: {data2_mean}, Median: {data2_median}, Mode: {mode_data2}")
 
 # Data2's mean (40.0) is much higher than data1's (13.6) because of the 
 # outlier 150 - mean is sensitive to extreme values.
@@ -237,7 +244,9 @@ x = [1, 2, 3, 4, 5]
 y = [2, 4, 6, 8, 10]
 corr_matrix = np.corrcoef(x, y)
 correlation = corr_matrix[0, 1]
-print(f"Correlation coefficient: {correlation}")
+print(f"Correlation matrix: {corr_matrix}")
+print(f"Coefficient: {correlation}")
+
 
 # The correlation to be 1 (or very close to it) because y = 2x
 # every increase in x produces a perfectly predictable, proportional increase

@@ -17,7 +17,7 @@ visual_output_path = 'outputs'
 
 
 # Task 1: Load Multiple Years of Data
-@task(task_run_name="Load Data")
+@task(task_run_name="Load Data", retries=3, retry_delay_seconds=2)
 def load_data(arr):
     res = []
     logger = get_run_logger()
@@ -59,7 +59,7 @@ def clean_columns(df):
         logger.info('Combine happiness_score and ladder_score into one columns')
     logger.info('Columns names cleaned successfully.')
     return df
-@task (task_run_name="Save Data", retries=3, retry_delay_seconds=2)
+@task (task_run_name="Save Data")
 def save_data(df, output_file):
         logger = get_run_logger()
         logger.info(f'Saving combined data to {output_file}...')
