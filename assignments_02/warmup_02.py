@@ -19,43 +19,46 @@ model.fit(years, salary)
 predict_4 = model.predict(experience_4)
 predict_8 = model.predict(experience_8)
 
-print(f"Slope {model.coef_[0]}") # one number for each column
-print(f"Intercept {model.intercept_}")
-print(f"Prediction for 4 years: {predict_4[0]}") #one number for each row
-print(f"Prediction for 8 years: {predict_8[0]}")
+print(f"Slope: {model.coef_[0]:.2f}")
+print(f"Intercept: {model.intercept_:.2f}")
+print(f"Prediction for 4 years experience: {predict_4[0]:.2f}")
+print(f"Prediction for 8 years experience: {predict_8[0]:.2f}")
 
 
 # --- Q2 ----
 x = np.array([10, 20, 30, 40, 50])
 print(f"Shape: {x.shape}")
-print(f"Reshape in 2D: {x.reshape(-1, 1)}")
+print(f"Reshape in 2D: {x.reshape(-1, 1).shape}")
 
 # sklearn needs X to be 2D because a 1D array is ambiguous —
 # it doesn't say whether the numbers are 5 samples with 1 feature each,
 # or 1 sample with 5 features. The 2D shape (rows=samples, cols=features)
 # removes that ambiguity.
 
-# --- Q3 ----
+# --- Q3 ---
 
 X_clusters, _ = make_blobs(n_samples=120, centers=3, cluster_std=0.8, random_state=7)
 
-#Unsupervised - seeing 1 array and there is no right answer, nobody teaches the model. .fit(X) <- 1 argument
+# Unsupervised - seeing 1 array with no right answer, nobody teaches the model. .fit(X) <- 1 argument
 kmeans = KMeans(n_clusters=3, random_state=42)
 cluster_labels = kmeans.fit_predict(X_clusters)
 centroids = kmeans.cluster_centers_
-print(f"Cluster center: {centroids}")
-labels = kmeans.labels_
-cluster_counts = np.bincount(labels)
-for cluster_id, count in enumerate(cluster_counts):
-    print(f"Cluster {cluster_id}: {count} data points")
 
+print("Cluster centers:")
+for i, center in enumerate(centroids):
+    print(f"  Cluster {i}: ({center[0]:.2f}, {center[1]:.2f})")
+
+cluster_counts = np.bincount(cluster_labels)
+print("\nPoints per cluster:")
+for cluster_id, count in enumerate(cluster_counts):
+    print(f"  Cluster {cluster_id}: {count} data points")
 
 plt.figure(figsize=(8, 6))
 plt.scatter(X_clusters[:, 0], X_clusters[:, 1], c=cluster_labels, s=50, cmap='viridis', alpha=0.7)
-plt.scatter(centroids[:, 0], centroids[:, 1], c='black', s=200, marker='X', label='Centroids')
-plt.title('K-Means Clustering Results')
-plt.xlabel('Feature 1 (Scaled)')
-plt.ylabel('Feature 2 (Scaled)')
+plt.scatter(centroids[:, 0], centroids[:, 1], c='black', s=200, marker='X', label='Cluster Centers')
+plt.title('K-Means Clustering: 3 Synthetic Blobs')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
 plt.legend()
 plt.savefig('outputs/kmeans_clusters.png')
 plt.close()
