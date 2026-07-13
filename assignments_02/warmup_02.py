@@ -1,5 +1,4 @@
 # --- scikit-learn API ---
-import os
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
@@ -58,8 +57,7 @@ plt.title('K-Means Clustering Results')
 plt.xlabel('Feature 1 (Scaled)')
 plt.ylabel('Feature 2 (Scaled)')
 plt.legend()
-os.makedirs('outputs', exist_ok=True)
-plt.savefig(os.path.join('outputs', 'kmeans_clusters.png'))
+plt.savefig('outputs/kmeans_clusters.png')
 plt.close()
 
 
@@ -75,8 +73,7 @@ plt.scatter(age, cost, c=smoker, cmap="coolwarm")
 plt.title("Medical Cost vs Age")
 plt.xlabel('Age')
 plt.ylabel('Cost')
-os.makedirs('outputs', exist_ok=True)
-plt.savefig(os.path.join('outputs', 'cost_vs_age.png'))
+plt.savefig('outputs/cost_vs_age.png')
 plt.close()
 
 # Red and blue dots form two clearly separated bands
@@ -134,7 +131,6 @@ plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color="blac
 plt.title("Predicted vs Actual")
 plt.xlabel('Prediction')
 plt.ylabel('Actual')
-os.makedirs('outputs', exist_ok=True)
-plt.savefig(os.path.join('outputs', 'predicted_vs_actual.png'))
+plt.savefig('outputs/predicted_vs_actual.png')
 # Above the diagonal: model underestimated the cost.
 # Below the diagonal: model overestimated the cost.
