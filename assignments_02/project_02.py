@@ -11,11 +11,12 @@ from sklearn.metrics import mean_squared_error, r2_score
 
 
 # Task 1: Load and Explore
-
+# Observation: the file uses semicolons (;) to separate fields, not commas.
+# So I need to pass delimiter=";" instead of the default comma
 file = 'student_performance_math.csv'
 df = pd.read_csv(file, delimiter=";")
 print("Shape:", df.shape)
-print("\nfirst 5 and data types:\n", df.head(5))
+print("\nfirst 5 rows:\n", df.head())
 print("\nData types:\n", df.dtypes)
 
 plt.hist(df['G3'], bins=21, range=(0, 20), edgecolor='black')
@@ -42,9 +43,14 @@ for col in yes_no_cols:
     df_nonzero[col] = df_nonzero[col].map({'yes': 1, 'no': 0});
 
 df_nonzero['sex'] = df_nonzero['sex'].replace({'F': 0, 'M': 1});
-print(df['sex'], df_nonzero['sex'] );
+
 coef_original, p_value_original = pearsonr(df['absences'], df['G3'])
 coef_filtered, p_value_filtered = pearsonr(df_nonzero['absences'], df_nonzero['G3'])
+print(f"coef_original: {coef_original}")
+print(f"p_value_original: {p_value_original}")
+
+print(f"coef_filtered: {coef_filtered}")
+print(f"p_value_filtered: {p_value_filtered}")
 
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
@@ -60,11 +66,7 @@ axes[1].set_ylabel("G3")
 
 plt.tight_layout()
 plt.show()
-print(f"coef_original: {coef_original}")
-print(f"p_value_original: {p_value_original}")
 
-print(f"coef_filtered: {coef_filtered}")
-print(f"p_value_filtered: {p_value_filtered}")
 # Output:
 # coef_original: 0.034247316150069325
 # p_value_original: 0.497331795543527
@@ -96,7 +98,7 @@ print(corr_df)
 
 # --- Plot 1: failures vs G3 (boxplot) ---
 # 'failures' has the strongest correlation with G3 among non-grade features
-# (coef = -0.294, p = 1.5), so it's worth a closer look.
+# (coef = -0.294, p = 1.5e-08), so it's worth a closer look.
 df_nonzero.boxplot(column='G3', by='failures', figsize=(6, 5))
 plt.title("Final Grade (G3) by Number of Past Failures")
 plt.suptitle('')
@@ -106,7 +108,6 @@ plt.tight_layout()
 plt.savefig('outputs/failures_vs_g3.png')
 plt.show()
 
-# Comments:
 # Comment: Median G3 drops steadily as failures increase: 11.5 for 0
 # failures, 10 for 1, 8.5 for 2, and 8 for 3. The spread also narrows -
 # students with 0 failures range widely (5-20), while students with 2-3
@@ -278,6 +279,7 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 r2_test = r2_score(y_test, y_pred)
 print(f"Test R2:  {r2_test}")
+print("\nCoefficients (with G1):")
 for name, coef in zip(feature_cols_w_g1, model.coef_):
     print(f"{name:12s}: {coef:+.3f}")
     
