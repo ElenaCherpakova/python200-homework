@@ -147,9 +147,14 @@ metadata = {
     "sklearn_version": sklearn.__version__,
     "features":        list(X_train.columns),
     "label":           "good_for_running",
+    "label_thresholds": (
+        "temp_max 7-26C, temp_min >= 0C, "
+        "precipitation < 3.0mm, wind_speed < 30km/h"
+    ),
     "best_params":     grid.best_params_,
     "test_auc":        round(test_auc, 4),
     "trained_on":      "2023 Open-Meteo, Toronto ON (lat 43.65, lon -79.38)",
+    
 }
 
 print(metadata)

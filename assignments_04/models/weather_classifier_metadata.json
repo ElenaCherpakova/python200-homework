@@ -8,6 +8,7 @@
     "wind_speed_10m_max"
   ],
   "label": "good_for_running",
+  "label_thresholds": "temp_max 7-26C, temp_min >= 0C, precipitation < 3.0mm, wind_speed < 30km/h",
   "best_params": {
     "clf__C": 10.0
   },
