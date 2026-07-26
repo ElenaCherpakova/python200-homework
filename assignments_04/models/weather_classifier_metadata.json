@@ -1,0 +1,16 @@
+{
+  "python_version": "3.13.1 (v3.13.1:06714517797, Dec  3 2024, 14:00:22) [Clang 15.0.0 (clang-1500.3.9.4)]",
+  "sklearn_version": "1.9.0",
+  "features": [
+    "temperature_2m_max",
+    "temperature_2m_min",
+    "precipitation_sum",
+    "wind_speed_10m_max"
+  ],
+  "label": "good_for_running",
+  "best_params": {
+    "clf__C": 10.0
+  },
+  "test_auc": 0.9032,
+  "trained_on": "2023 Open-Meteo, Toronto ON (lat 43.65, lon -79.38)"
+}
