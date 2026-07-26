@@ -106,22 +106,36 @@ plt.savefig("outputs/weather_roc.png")
 plt.show()
 
 # Step 4: Reflect on Evaluation
-# The AUC of 0.90 is good, but a bit lower than expected. Since the "good
-# running day" label follows exact rules (temp, wind, rain cutoffs), a
-# near-perfect score seemed likely. Logistic regression draws a straight
-# line to separate classes, but the real rule is more like a "box" with four
-# conditions — so it can't match it perfectly.
+# AUC quality: The AUC of 0.90 is good, but lower than I initially expected.
+# Since the "good running day" label follows exact rule-based cutoffs (temp,
+# wind, rain), I assumed a near-perfect score was likely. The gap comes from
+# a mismatch between the model and the label: Logistic Regression can only
+# draw a straight line (linear decision boundary) to separate classes, but
+# the actual rule is a "box" — four conditions that must all hold at once.
+# A linear model structurally cannot represent that shape perfectly, which
+# caps the achievable AUC even with clean, rule-based labels.
 
-# Looking at the classification report, recall for good days is low (0.64)
-# while precision is high (0.90). This means the model misses more good
-# days than it wrongly recommends bad ones. In other words, it under-
-# recommends running rather than over-recommends it.
-#
-# For a running app, missing a good day is a minor inconvenience, while
-# recommending a bad day is worse. So the model's current caution is reasonable. 
-# If we wanted to catch more good days, we could lower the threshold from 0.5 
-# to around 0.35-0.4, accepting more false positives in exchange
-# for fewer missed good days.
+# Precision/recall: Looking at the classification report, precision for good
+# days is high (0.90) but recall is lower (0.64). High precision means that
+# when the model says "go run," it's usually right. Lower recall means it's
+# missing a meaningful chunk of days that were actually good for running.
+# So the model is conservative — it would rather stay silent than risk a
+# bad recommendation.
+
+# Error type: Since precision > recall here, the model's imbalance leans
+# toward false negatives (missed good days) rather than false positives
+# (wrongly recommending bad days). In other words, it under-recommends
+# running rather than over-recommends it.
+
+# Threshold choice: For a running app, these two error types aren't equally
+# costly. Missing a good day (false negative) is a minor inconvenience — the
+# user just doesn't get a recommendation they could have used. Recommending
+# a bad day (false positive) is worse, since the user could show up to poor
+# conditions based on the app's advice. Given that, the model's current
+# caution at the default 0.5 threshold is reasonable. If we wanted to trade
+# some of that caution for better coverage, we could lower the threshold to
+# around 0.35-0.4, accepting more false positives in exchange for catching
+# more of the good days we're currently missing.
 
 # Step 5: Save the Model
 

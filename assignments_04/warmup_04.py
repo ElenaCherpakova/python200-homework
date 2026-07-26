@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_classification
+
 from sklearn.metrics import f1_score
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
@@ -17,6 +18,8 @@ from sklearn.metrics import (
     roc_auc_score,
     RocCurveDisplay,
     classification_report,
+    confusion_matrix
+
 )
 import joblib
 
@@ -79,13 +82,12 @@ plt.show()
 
 #finding FPR where TPR first reaches 0.80 on each curve
 fpr_raw_at_80 = fpr_raw[np.argmax(tpr_raw >= 0.80)]
-fpr_scaled_at_80 = fpr_scaled[np.argmax(fpr_scaled >= 0.80)]
+fpr_scaled_at_80 = fpr_scaled[np.argmax(tpr_scaled >= 0.80)]
 print(f"FPR at TPR=0.80 - Logistic Regression: {fpr_raw_at_80:.3f}")
 print(f"FPR at TPR=0.80 - KNN: {fpr_scaled_at_80:.3f}")
-
 # Comments:
 # FPR at TPR=0.80 - Logistic Regression: 0.580
-# FPR at TPR=0.80 - KNN: 1.000
+# FPR at TPR=0.80 - KNN: 0.110
 # Logistic Regression has the lower FPR at TPR=0.80.
 # which means if we need to catch 80% of positives, Logistic Regression gives
 # fewer false alarms than KNN at that point on the curve.
@@ -106,16 +108,28 @@ for i, threshold in enumerate(thresholds):
         best_f1 = f1
         best_threshold = threshold
         best_idx = i
+
+y_pred_default = (y_probs_lr >= 0.5).astype(int)
+f1_default = f1_score(y_test, y_pred_default)
+tn, fp, fn, tp = confusion_matrix(y_test, y_pred_default).ravel()
+tpr_default = tp / (tp + fn)
+fpr_default = fp / (fp + tn)
 print(f"Best threshold: {best_threshold:.3f}")
 print(f"TPR: {tpr[best_idx]}")
 print(f"FPR: {fpr[best_idx]}")
 print(f"F1: {best_f1}")
-
+print()
+print(f"Default threshold: 0.500")
+print(f"TPR: {tpr_default:.3f}")
+print(f"FPR: {fpr_default:.3f}")
+print(f"F1: {f1_default:.3f}")
 #Comments:
-# the optimal threshold (0.276) is lower than the default 0.5, meaning the
-# model needs less evidence before predicting positive. compared to 0.5,
-# this catches more true positives (higher TPR) but also more false alarms (higher FPR).
-#In real app we would pick a threshold below 0.5 when missing a possitive case 
+# The optimal threshold (0.276) is lower than default (0.5), so the model
+# predicts positive more easily. This raises TPR from 0.620 to 0.890 (more
+# true positives caught) but also raises FPR from 0.300 to 0.690 (many more
+# false alarms). F1 barely improves (0.646 -> 0.690) since the gain from
+# extra true positives is mostly cancelled out by all the extra false positives.
+# In real app we would pick a threshold below 0.5 when missing a possitive case 
 # is way more costly that a false alarm
 
 # --- GridSearchCV ---
@@ -226,7 +240,7 @@ print("Predictions match. Model saved and loaded successfully.")
 # meaningless.
 
 # Q2
-# --- Simulated prediction script ---.
+# --- Simulated prediction script ---
 joblib.dump(best_lr_pipe, "models/warmup_model.pkl")
 loaded_clf = joblib.load("models/warmup_model.pkl")
 
@@ -240,7 +254,8 @@ predictions = loaded_clf.predict(new_samples)
 probabilities = loaded_clf.predict_proba(new_samples)[:, 1]
 
 for i, (pred, prob) in enumerate(zip(predictions,probabilities )):
-    print(f"Row: {i+1}: predicted class = {pred}, probability of class 1 = {prob:.3f}")
+    label = "class 1" if pred == 1 else "class 0"
+    print(f"Row {i+1}: predicted class = {label}, probability of class 1 = {prob:.3f}")
     
 # Comments:
 # Row 1: predicted class = 1, probability = 1.000
