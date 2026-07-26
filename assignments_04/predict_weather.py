@@ -1,10 +1,6 @@
-import os
-import requests
-import sys
 import json
 import pandas as pd
 import matplotlib.pyplot as plt
-import sklearn
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler

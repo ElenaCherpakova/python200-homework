@@ -103,7 +103,6 @@ ax.legend()
 plt.tight_layout()
 os.makedirs("outputs", exist_ok=True)
 plt.savefig("outputs/weather_roc.png")
-plt.show()
 
 # Step 4: Reflect on Evaluation
 # AUC quality: The AUC of 0.90 is good, but lower than I initially expected.

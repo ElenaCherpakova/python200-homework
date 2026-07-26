@@ -143,16 +143,15 @@ param_grid = {"clf__C": [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]}
 
 grid = GridSearchCV(pipe, param_grid, cv=5, scoring="roc_auc")
 grid.fit(X_train, y_train)
-best_lr_pipe = grid.best_estimator_
+best_pipe = grid.best_estimator_
 
 print(f"Best C: {grid.best_params_['clf__C']}")
 print(f"Best CV AUC: {grid.best_score_:.3f}")
 
-best_model = grid.best_estimator_
-y_pred = best_model.predict(X_test)
+y_pred = best_pipe.predict(X_test)
 print(classification_report(y_test, y_pred))
 
-y_probs_best = best_model.predict_proba(X_test)[:, 1]
+y_probs_best = best_pipe.predict_proba(X_test)[:, 1]
 test_auc = roc_auc_score(y_test, y_probs_best)
 print(f"Test AUC: {test_auc:.3f}")
 
@@ -169,7 +168,7 @@ print(results.to_string(index=False))
 # really improve anything here - C doesn't matter much for this data.
 
 # Q2
-
+print("--------Q2--------")
 pipe = Pipeline([
     ("scaler", StandardScaler()),
     ("classifier", DecisionTreeClassifier(random_state=42))
@@ -182,8 +181,8 @@ param_grid = {
 grid = GridSearchCV(estimator=pipe, param_grid=param_grid, cv=5, scoring="roc_auc")
 grid.fit(X_train, y_train)
 
-best_lr_pipe = grid.best_estimator_
-y_probs_best = best_model.predict_proba(X_test)[:, 1]
+best_tree_pipe = grid.best_estimator_
+y_probs_best = best_tree_pipe.predict_proba(X_test)[:, 1]
 test_auc = roc_auc_score(y_test, y_probs_best)
 print(f"Test AUC: {test_auc:.3f}")
 print(f"Best max_depth: {grid.best_params_['classifier__max_depth']}")
@@ -206,26 +205,24 @@ print(f"Best CV AUC: {grid.best_score_:.3f}")
 # the model is to explain to others before deciding for real.
 
 # Q3
+print("--------Q3--------")
 results = pd.DataFrame(grid.cv_results_)[["param_classifier__max_depth", "mean_test_score", "std_test_score"]]
 results = results.sort_values("mean_test_score", ascending=False)
 print(results.to_string(index=False))
 
 # Comments:
-# C=1.0: mean=0.7725, std=0.00593
-# C=0.1: mean=0.7718, std=0.00701
-# these two have almost the same mean AUC, but C=1.0 has lower std - meaning
-# its score is more stable across the 5 CV folds.
-# if I had to pick between them, I'd choose C=1.0. when mean scores are this
-# close, I'd rather go with the more stable option - lower std means the
-# model's performance doesn't swing as much depending on which data it sees,
-# so it's more reliable.
+# max_depth=5 has the best mean AUC (0.9165) and a reasonably low std, so
+# it's the clear winner - no tradeoff needed.
+# Performance rises from depth=2 to depth=5 (too simple/underfit at shallow
+# depths), then falls again as depth increases past 5 (overfitting).
+# max_depth=None has both the lowest score and highest std (0.039) - a clearsign of overfitting.
 
 # --- joblib ---
 # Q1
 os.makedirs('models', exist_ok=True)
-joblib.dump(best_lr_pipe, "models/warmup_model.pkl")
+joblib.dump(best_pipe, "models/warmup_model.pkl")
 loaded_clf = joblib.load("models/warmup_model.pkl")
-original_preds = best_lr_pipe.predict(X_test)
+original_preds = best_pipe.predict(X_test)
 loaded_preds   = loaded_clf.predict(X_test)
 
 assert (original_preds == loaded_preds).all(), "Predictions do not match!"
@@ -241,7 +238,7 @@ print("Predictions match. Model saved and loaded successfully.")
 
 # Q2
 # --- Simulated prediction script ---
-joblib.dump(best_lr_pipe, "models/warmup_model.pkl")
+joblib.dump(best_pipe, "models/warmup_model.pkl")
 loaded_clf = joblib.load("models/warmup_model.pkl")
 
 new_samples = np.array([
