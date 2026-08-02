@@ -265,7 +265,7 @@ def run_chatbot():
 
         # 5. Check if the user wants to rewrite bullets
         #    (hint: look for keywords like "bullet" or "resume" in user_input.lower())
-        if "bullet" in user_input.lower() and "resume" in user_input.lower():
+        if "bullet" in user_input.lower() or "resume" in user_input.lower():
             print("\nJob Application Helper: Paste your bullet points below, one per line.")
             print("When you're done, type 'DONE' on its own line.\n")
             raw_bullets = []
