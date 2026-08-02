@@ -35,9 +35,15 @@ for temp in temperatures:
     print(f"Temperature: {temp}")
     print(f"Text response for {temp}: {response.choices[0].message.content}")
     
-#Comments:
-# For temperature 0 and 0.7, the responses are more focused and coherent, while at temperature 1.5, 
-# the response is more creative and diverse, but may also be less relevant or coherent.
+
+# Comments:
+# At temperature=0, the response is the most deterministic and predictable --
+# running it again would likely give the same or a very similar name.
+# At temperature=0.7, the response is a bit more varied and creative while
+# staying coherent and plausible as a real business name.
+# At temperature=1.5, the response becomes noticeably more unusual/creative,
+# but also risks being less coherent or less like a name a real company
+# would realistically use. Higher temperature trades reliability for novelty.
 
 # API Q3
 
@@ -51,6 +57,13 @@ response = client.chat.completions.create(
 print("Responses for API Q3:")
 for i, choice in enumerate(response.choices, start=1):
     print(f"Response {i}: {choice.message.content}")
+    
+# Comments:
+# n=3 requests three independent completions for the same prompt in a single
+# API call. With temperature=1.0, the three responses differ from each other --
+# each is a different fun fact or a different phrasing of a similar fact,
+# showing the model sampling different plausible completions rather than
+# returning the same answer three times.
 
 # API Q4
 response = client.chat.completions.create(
@@ -91,7 +104,13 @@ response_2 = client.chat.completions.create(
 print(f"Text response for System Messages and Different Personas: {response_2.choices[0].message.content}")
 
 # Comments:
-# The first response is more encouraging and simplified, while the second response is more academic and detailed.
+# The first response (encouraging tutor persona) is simpler, warmer, and ends
+# with explicit encouragement, matching the system prompt's instruction.
+# The second response (professor persona) is more formal and academic, using
+# more precise terminology and giving broader context about why list
+# comprehensions exist, rather than just how to use them. Same question,
+# same underlying model, but the system message meaningfully shapes tone,
+# vocabulary, and depth.
 
 # Q2
 print("\n--- System Messages and Personas Q2 ---")
@@ -107,12 +126,15 @@ response = client.chat.completions.create(
 )
 
 print(f"Text response for System Messages and Personas Q2: {response.choices[0].message.content}")
-# Comments:
-# The model is able to remember the user's name from the previous messages and respond accordingly.
 
+# Comments:
+# The model correctly recalls "Jordan" from the earlier user turn in the
+# messages list. This works because the full conversation history -- including
+# both the user's and the assistant's prior turns -- is sent with every API
+# call; the model itself has no memory between calls, so recall only happens
+# because the calling code includes the full history each time.
 
 # --- Prompt Engineering ---
-# Q1
 
 def get_completion(prompt: str, model="gpt-4o-mini", temperature=0):
     """
@@ -132,6 +154,7 @@ reviews = [
     "Great price, but the documentation is nearly impossible to follow."
 ]
 
+# Q1 -- Zero-shot (no examples given)
 prompt = """
 Classify the sentiment of each review below as positive, negative, or mixed. Label each result with its review number.
 """
@@ -140,7 +163,8 @@ prompt += "\n".join([f"Review: {review}" for review in reviews])
 response = get_completion(prompt)
 print(f"Zero-shot result: {response}")
 
-# Q2
+# Q2 -- One-shot (a single example showing the desired output format)
+
 prompt = """
 Classify the sentiment of each review below as positive, negative, or mixed. 
 Label each result with its review number. Display in the following format: Example: 
@@ -156,7 +180,8 @@ print(f"One-shot result: {response}")
 # provides the results in a consistent and expected manner. This is an example of prompt engineering, 
 # where we refine the prompt to guide the model's output more effectively.
 
-# Q3
+# Q3 -- Few-shot (multiple examples, one per class: positive, negative, mixed)
+
 reviews = [
     "The onboarding process was smooth and the team was welcoming.",
     "The software crashes constantly and support never responds.",
@@ -185,7 +210,7 @@ print(f"Few-shot result: {response}")
 
 
 
-# Q4
+# Q4 -- Chain-of-thought reasoning with a labeled final answer
 prompt = """
 Show your step-by-step reasoning using plain text only, then give the final answer on its own line labelled: Final Answer: <value>
 Problem: A data engineer earns $85,000 per year. She gets a 12% raise, then 6 months later
@@ -201,7 +226,8 @@ print(response)
 # where the reasoning process is important to verify the correctness of the answer. The final answer is
 # clearly labeled, making it easy to identify the result of the calculations.
 
-# Q5
+# Q5 -- Structured JSON output with sentiment, confidence, and reason
+
 review = "I've been using this tool for three months. It handles large datasets well, \
 but the UI is clunky and the export options are limited."
 
@@ -221,7 +247,7 @@ try:
 except json.JSONDecodeError:
     print("Error: Invalid JSON response")
     
-# Q6
+# Q6 -- Delimiters to separate user text from instructions
 
 user_text = "First boil a pot of water. Once boiling, add a handful of salt and the \
 pasta. Cook for 8-10 minutes until al dente. Drain and toss with your sauce of choice."
@@ -247,54 +273,65 @@ If it does not contain instructions, respond with exactly: "No steps provided."
 no_steps_response = get_completion(no_steps_prompt, temperature=0)
 print(no_steps_response)
 
-#Comments:
-# Delimiters (triple backticks) help to clearly separate user instructions from data, reducing the risk of promp injection and misinterpretation.
 
+# Comments:
+# Delimiters (triple backticks) clearly mark where the user's input text
+# begins and ends, separating it from the surrounding instructions. Without
+# them, the model can struggle to tell where the instructions stop and the
+# data starts - especially risky if the user's text itself contains words
+# that look like instructions. This is also a basic defense against prompt
+# injection: content inside the delimited block is treated as DATA to be
+# processed, not as commands the model should follow.
 
 # --- Local Models with Ollama ---
 
 # Q1
-
-# Ollama's comment:
+# Terminal command run (Ollama, local model):
+#   ollama run qwen3:0.6b "Explain what a large language model is in two sentences."
+#
+# Ollama's terminal output (pasted exactly as returned):
 # Thinking...
-# Okay, the user wants me to explain a large language model in two 
-# sentences. Let me start by breaking down the key elements. First, a large 
-# language model is a type of artificial intelligence that can understand 
-# and generate text. But I need to make sure I cover the main points without 
+# Okay, the user wants me to explain a large language model in two
+# sentences. Let me start by breaking down the key elements. First, a large
+# language model is a type of artificial intelligence that can understand
+# and generate text. But I need to make sure I cover the main points without
 # getting too technical.
-
-# I should mention that they have a vast amount of training data and use 
-# complex algorithms to process information. Then, I can talk about how they 
-# can create and understand text, like writing stories or answering 
-# questions. Wait, but the user asked for two sentences. Let me check that 
-# again. Yes, two sentences. Make sure each sentence is concise and covers 
+#
+# I should mention that they have a vast amount of training data and use
+# complex algorithms to process information. Then, I can talk about how they
+# can create and understand text, like writing stories or answering
+# questions. Wait, but the user asked for two sentences. Let me check that
+# again. Yes, two sentences. Make sure each sentence is concise and covers
 # the essential aspects.
 # ...done thinking.
-
-# A large language model is a type of artificial intelligence designed to 
-# understand and generate text, such as language, music, or any form of 
-# human communication. It leverages massive datasets and advanced algorithms 
-# to process and comprehend complex information, enabling it to create 
-# meaningful content and perform tasks like answering questions or writing 
+#
+# A large language model is a type of artificial intelligence designed to
+# understand and generate text, such as language, music, or any form of
+# human communication. It leverages massive datasets and advanced algorithms
+# to process and comprehend complex information, enabling it to create
+# meaningful content and perform tasks like answering questions or writing
 # stories.
+
+# Python/OpenAI equivalent - same prompt, run through the API:
 
 prompt = """Explain what a large language model is in two sentences."""
 
 response = get_completion(prompt)
 print(f"OpenAI (gpt-4o-mini) response: {response}")
 
-# OpenAi's comment:
-#  A large language model is an artificial intelligence system designed to understand and 
-#  generate human-like text by analyzing vast amounts of written data. It uses deep learning techniques, particularly neural networks, 
-#  to predict and produce coherent and contextually relevant language based on the input it receives.
-
-
 # Comments:
-# Ollama responds with a more conversational and detailed explanation, while OpenAI's response is more concise and technical.
-# Both provide accurate information, but the style and depth of explanation differ.
-
-# Advantage and Disadvantage of running a model locally:
-# Running a model locally can provide more control over the data and privacy, as well as potentially lower latency for certain applications. 
-# However, it may require significant computational resources and technical expertise to set up and maintain,
-# which can be a barrier for some users. Additionally, local models may not always have access to the 
-# latest updates or improvements that cloud-based models receive, potentially leading to outdated performance or capabilities.
+# Ollama (qwen3:0.6b) responds with a more conversational, exploratory style --
+# it visibly "thinks out loud" before answering, and the final answer is
+# longer and less tightly scoped to "two sentences" than requested.
+# OpenAI's response is more concise, technical, and closely follows the
+# instruction to keep it to two sentences.
+#
+# Advantage and disadvantage of running a model locally:
+# Running a model locally provides more control over data and privacy, and
+# potentially lower latency once the model is loaded, since there's no
+# network round-trip to an external API. However, it requires meaningful
+# local compute resources and setup/maintenance effort, and a small local
+# model like qwen3:0.6b is noticeably less capable at following precise
+# instructions (e.g., staying within a strict sentence count) than a larger
+# hosted model. Local models also don't automatically receive the latest
+# updates/improvements that cloud-based models get pushed regularly.
