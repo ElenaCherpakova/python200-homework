@@ -233,11 +233,13 @@ def run_chatbot():
     print("=" * 50)
     print("Job Application Helper")
     print("=" * 50)
-    
+    # EXTRA (not required by the assignment): optional file-upload flow for bullets,
+    # read from a .txt file at the start of the session instead of pasted interactively.
     filepath = input("if you have a .txt file with resume bullet points, enter the path (or press Enter to skip): ").strip()
     if filepath:
         try:
             result = rewrite_bullets_file(filepath)
+            # result = rewrite_bullets_text(raw_bullets)
             if result:
                 print(REVIEW_REMINDER)
                 summary = "\n".join(f"- {i['improved']}" for i in result)
@@ -280,6 +282,7 @@ def run_chatbot():
                     break
                 if line:
                     raw_bullets.append(line)
+            result = rewrite_bullets_text(raw_bullets)
             for item in result:
                 print(f"Original: {item['original']}")
                 print(f"Improved: {item['improved']}")
@@ -309,8 +312,8 @@ def run_chatbot():
             # - Append the user's message to `messages`
             messages.append({"role": "user", "content": user_input})
             # - Call get_completion(messages)
-            # get_completion_response = get_completion(messages)
-            get_completion_response = get_completion_ollama(messages)
+            get_completion_response = get_completion(messages)
+            # get_completion_response = get_completion_ollama(messages)
             # - Print the reply
             print(f"\nJob Application Helper: {get_completion_response}\n")
             # - Append the reply to `messages` as an assistant message
