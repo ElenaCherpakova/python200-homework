@@ -251,11 +251,6 @@ print(no_steps_response)
 
 # Q1
 
-prompt = """Explain what a large language model is in two sentences."""
-
-response = get_completion(prompt)
-print(f"Result: {response}")
-
 # Ollama's comment:
 # Thinking...
 # Okay, the user wants me to explain a large language model in two 
@@ -279,6 +274,11 @@ print(f"Result: {response}")
 # meaningful content and perform tasks like answering questions or writing 
 # stories.
 
+prompt = """Explain what a large language model is in two sentences."""
+
+response = get_completion(prompt)
+print(f"OpenAI (gpt-4o-mini) response: {response}")
+
 # OpenAi's comment:
 #  A large language model is an artificial intelligence system designed to understand and 
 #  generate human-like text by analyzing vast amounts of written data. It uses deep learning techniques, particularly neural networks, 
@@ -288,6 +288,7 @@ print(f"Result: {response}")
 # Comments:
 # Ollama responds with a more conversational and detailed explanation, while OpenAI's response is more concise and technical.
 # Both provide accurate information, but the style and depth of explanation differ.
+
 # Advantage and Disadvantage of running a model locally:
 # Running a model locally can provide more control over the data and privacy, as well as potentially lower latency for certain applications. 
 # However, it may require significant computational resources and technical expertise to set up and maintain,

@@ -328,15 +328,20 @@ if __name__ == "__main__":
 # resume conventions like adding metrics and numbers to every bullet, but not every industry
 # or culture writes resumes that way, so this style might not fit everyone equally well.
 #
+# Q2: If a job-seeker submitted the bot's output directly without reviewing it, a few things
+# could go wrong. The bot sometimes drifts from the facts in the original text for example,
+# in earlier testing it changed "on time" to "ahead of schedule" for a rewritten bullet, which
+# is a small but real embellishment the user didn't actually claim. It could also produce a
+# generic, one-size-fits-all tone that doesn't match the employer's industry or culture, making
+# the application feel impersonal or even inaccurate to the candidate's real experience.
+#
 # Q3: One guardrail I would add is a confidence disclaimer. The bot should always remind
 # users that it is an AI and may not have accurate, up-to-date, or industry-specific
 # knowledge, and that its output is a starting draft, not a finished product.
 
-
 # Extra
 
 # Top-p experiment 
-
 
 def warm_up(prompt, top_p_values=(0.1, 0.5, 1.0)):
     
