@@ -317,7 +317,7 @@ if __name__ == "__main__":
     run_chatbot()
     
     
-# Task 6:
+# Task 6: Ethics Reflection
 # Comments:
 # Q1: The bot learned mostly from Western, corporate-style writing, so its advice may favor
 # one type of tone or industry over others. For example, it tends to push North American
@@ -336,7 +336,6 @@ if __name__ == "__main__":
 # knowledge, and that its output is a starting draft, not a finished product.
 
 # --- EXTRA (not required by the base assignment): confidence-aware variant ---
-
 
 
 # 4. Confidence-aware output:

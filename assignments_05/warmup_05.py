@@ -37,13 +37,17 @@ for temp in temperatures:
     
 
 # Comments:
-# At temperature=0, the response is the most deterministic and predictable --
-# running it again would likely give the same or a very similar name.
-# At temperature=0.7, the response is a bit more varied and creative while
-# staying coherent and plausible as a real business name.
-# At temperature=1.5, the response becomes noticeably more unusual/creative,
-# but also risks being less coherent or less like a name a real company
-# would realistically use. Higher temperature trades reliability for novelty.
+# What I notice: at temperature=0, the output is deterministic and predictable -
+# running it again gives the same or nearly the same name every time. At
+# temperature=0.7, the output is somewhat more varied while still sounding like
+# a plausible, coherent business name. At temperature=1.5, the output becomes
+# noticeably more unusual and creative, but also risks sounding less like a
+# real company name and more like a random or slightly incoherent phrase.
+#
+# Which temperature for consistent, reproducible output: temperature=0. It
+# minimizes randomness in the model's token selection, so repeated calls with
+# the same prompt return the same (or very nearly the same) result -- exactly
+# what's needed when reproducibility matters more than creative variation.
 
 # API Q3
 
@@ -53,21 +57,9 @@ response = client.chat.completions.create(
     n=3,
     temperature=1.0
 )
-
-print(f"API Q3 -- requested n={3} completions for the same prompt:")
-print(f"Total completions returned: {len(response.choices)}\n")
-
 for i, choice in enumerate(response.choices, start=1):
-    print(f"--- Completion {i} of {len(response.choices)} ---")
-    print(choice.message.content)
-    print()
+    print(f"Completion {i}: {choice.message.content}")
     
-# Comments:
-# n=3 requests three independent completions for the same prompt in a single
-# API call. With temperature=1.0, the three responses differ from each other --
-# each is a different fun fact or a different phrasing of a similar fact,
-# showing the model sampling different plausible completions rather than
-# returning the same answer three times.
 
 # API Q4
 response = client.chat.completions.create(
@@ -77,15 +69,15 @@ response = client.chat.completions.create(
 )
 print(f"Text response for API Q4: {response.choices[0].message.content}")
 
-#Comments:
-# max_tokens=15 caps the response at 15 tokens, so the output is TRUNCATED -
-# the model gets cut off mid-sentence before it finishes explaining neural
-# networks, rather than producing a complete, shorter answer on its own.
-# In a real application, this truncation behavior is useful for controlling
-# API cost (fewer tokens billed per call) and for enforcing hard length limits
-# in space-constrained UI, like a chat bubble, push notification, or preview
-# card even though it risks cutting off a response before the full idea
-# is expressed.
+# Comments:
+# What happened: the response is cut off mid-sentence/mid-thought, because
+# max_tokens=15 caps generation at 15 tokens - far too few to fully explain
+# neural networks, so the output is TRUNCATED rather than a complete, shorter
+# explanation the model chose on its own.
+# Why use max_tokens in a real application: it controls API cost (fewer
+# tokens billed per call) and enforces hard length limits for space-constrained
+# UI, like a chat bubble, notification, or preview card - useful even though
+# it risks cutting a response off before the full idea is expressed.
 
 # --- System Messages and Personas ---
 # Q1
