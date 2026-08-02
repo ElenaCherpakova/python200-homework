@@ -41,10 +41,10 @@ def print_token_status():
     Print the running token total and warn if a new threshold was crossed.
     """
     print(f"[Tokens] Running total: {total_tokens_used}")
-    current_threshold = total_tokens_used
+    current_threshold = total_tokens_used // TOKEN_BUDGET_THRESHOLD
     if current_threshold >= 1 and current_threshold not in warned_threshold:
         warned_threshold.add(current_threshold)
-    print(f"Heads up: you've used over {current_threshold * TOKEN_BUDGET_THRESHOLD} tokens this session.\n")
+        print(f"Heads up: you've used over {current_threshold * TOKEN_BUDGET_THRESHOLD} tokens this session.\n")
 
 system_prompt = """
 You are a career transition assistant that helps users prepare job application
@@ -82,7 +82,7 @@ Scope and behavior rules:
 
 # Task 2
 
-def rewrite_bullets_text(bullets: str) -> list[str]:
+def rewrite_bullets(bullets: str) -> list[str]:
     bullet_text = "\n".join(f"- {b}" for b in bullets)
     prompt = f"""
     You are a professional resume coach helping a career changer.
@@ -90,9 +90,8 @@ def rewrite_bullets_text(bullets: str) -> list[str]:
     Use strong action verbs. Do not invent facts that aren't implied by the original. Great to use some metrix to show impact.
     Keep the same number of bullet points, and keep them concise (1-2 lines each).
 
-    Return ONLY a valid JSON list. Each item should have 3 keys:
-    "original" (the original bullet), "improved" (your rewritten version) and confidence (float, 0-1, representing
-    how confident you are that the improved version is accurate and well-supported by the original text).
+    Return ONLY a valid JSON list. Each item should have 2 keys:
+    "original" (the original bullet) and "improved" (your rewritten version).
 
     Bullet points:
     ```
@@ -103,17 +102,11 @@ def rewrite_bullets_text(bullets: str) -> list[str]:
                 {"role": "user", "content": prompt}]
     response = get_completion(messages, temperature=0)
     
-
     try:
         result = json.loads(response)
         for item in result:
-            confidence = item.get("confidence", 1.0)
             print('Original:', item['original'])
             print('Improved:', item['improved'])
-            if confidence < 0.7:
-                print(f"Flagged (confidence {confidence:.2f} - review this one carefully).")
-                print('Original:', item['original'])
-                print('Improved:', item['improved'])
 
         return result
     except json.JSONDecodeError:
@@ -128,7 +121,7 @@ def rewrite_bullets_file(filepath: str) -> list[str]:
     if not bullets:
         print(f"No bullet points found in {filepath}")
         return []
-    return rewrite_bullets_text(bullets)
+    return rewrite_bullets(bullets)
 
 
 # Task 3
@@ -239,7 +232,7 @@ def run_chatbot():
     if filepath:
         try:
             result = rewrite_bullets_file(filepath)
-            # result = rewrite_bullets_text(raw_bullets)
+            # result = rewrite_bullets(raw_bullets)
             if result:
                 print(REVIEW_REMINDER)
                 summary = "\n".join(f"- {i['improved']}" for i in result)
@@ -282,7 +275,7 @@ def run_chatbot():
                     break
                 if line:
                     raw_bullets.append(line)
-            result = rewrite_bullets_text(raw_bullets)
+            result = rewrite_bullets(raw_bullets)
             for item in result:
                 print(f"Original: {item['original']}")
                 print(f"Improved: {item['improved']}")
@@ -342,9 +335,63 @@ if __name__ == "__main__":
 # users that it is an AI and may not have accurate, up-to-date, or industry-specific
 # knowledge, and that its output is a starting draft, not a finished product.
 
-# Extra
+# --- EXTRA (not required by the base assignment): confidence-aware variant ---
 
-# Top-p experiment 
+
+
+# 4. Confidence-aware output:
+
+def rewrite_bullets_with_confidence(bullets: list[str]) -> list[dict]:
+    """
+    Extension of rewrite_bullets(): adds a "confidence" field (0-1) and flags
+    any bullet below 0.7 for the user to review carefully. Kept separate so
+    the required rewrite_bullets() schema stays exactly as specified.
+    """
+    if not bullets:
+        print("No bullet points provided.")
+        return []
+ 
+    bullet_text = "\n".join(f"- {b}" for b in bullets)
+    prompt = f"""
+    You are a professional resume coach helping a career changer.
+    Rewrite each resume bullet point below to be more specific, results-oriented, and compelling.
+    Use strong action verbs. Do not invent facts that aren't implied by the original.
+    Where appropriate, use metrics to show impact, but only if implied by the original bullet.
+    Keep the same number of bullet points, and keep them concise (1-2 lines each).
+    Respond ONLY with valid JSON, no other text, no markdown code fences.
+ 
+    Return ONLY a valid JSON list. Each item should have three keys:
+    "original" (the original bullet), "improved" (your rewritten version), and
+    "confidence" (float, 0-1, representing how confident you are that the
+    improved version is accurate and well-supported by the original text).
+ 
+    Bullet points:
+    ```
+    {bullet_text}
+    ```
+    """
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": prompt}
+    ]
+    response = get_completion(messages, temperature=0)
+ 
+    try:
+        result = json.loads(response)
+        for item in result:
+            confidence = item.get("confidence", 1.0)
+            print("Original:", item["original"])
+            print("Improved:", item["improved"])
+            if confidence < 0.7:
+                print(f"Flagged (confidence {confidence:.2f}) -- review this one carefully.")
+            print()
+        return result
+    except json.JSONDecodeError:
+        print("Failed to parse JSON from the response.")
+        print("Raw response:", response)
+        return []
+
+# 5. Top-p experiment 
 
 def warm_up(prompt, top_p_values=(0.1, 0.5, 1.0)):
     
