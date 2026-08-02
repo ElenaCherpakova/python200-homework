@@ -158,7 +158,7 @@ reviews = [
 prompt = """
 Classify the sentiment of each review below as positive, negative, or mixed. Label each result with its review number.
 """
-prompt += "\n".join([f"Review: {review}" for review in reviews])
+prompt += "\n".join([f"{i+1}. Review: {review}" for i, review in enumerate(reviews)])
 
 response = get_completion(prompt)
 print(f"Zero-shot result: {response}")
@@ -171,7 +171,7 @@ Label each result with its review number. Display in the following format: Examp
 Review: Fast shipping but the item arrived damaged." Sentiment: mixed
 """
 
-prompt += "\n".join([f"Review: {review}" for review in reviews])
+prompt += "\n".join([f"{i+1}. Review: {review}" for i, review in enumerate(reviews)])
 response = get_completion(prompt)
 print(f"One-shot result: {response}")
 
@@ -198,7 +198,7 @@ Review: Fast shipping but the item arrived damaged. Sentiment: mixed
 Now classify these:
 """
 
-prompt += "\n".join([f"Review: {review}" for review in reviews])
+prompt += "\n".join([f"{i+1}. Review: {review}" for i, review in enumerate(reviews)])
 response = get_completion(prompt)
 print(f"Few-shot result: {response}")
 
