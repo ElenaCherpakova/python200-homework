@@ -61,11 +61,14 @@ response = client.chat.completions.create(
 print(f"Text response for API Q4: {response.choices[0].message.content}")
 
 #Comments:
-# We might want to use max_tokens parameter to limit the length of the response.
-# This can be particularly useful in applications where response length is critical, 
-# such as in chatbots or when displaying information on limited screen space.
-# In our case, we set max_tokens to 15, which means the model will generate a response that is at most 15 tokens long and 
-# may be cut off if the explanation requires more tokens to be complete.
+# max_tokens=15 caps the response at 15 tokens, so the output is TRUNCATED -
+# the model gets cut off mid-sentence before it finishes explaining neural
+# networks, rather than producing a complete, shorter answer on its own.
+# In a real application, this truncation behavior is useful for controlling
+# API cost (fewer tokens billed per call) and for enforcing hard length limits
+# in space-constrained UI, like a chat bubble, push notification, or preview
+# card even though it risks cutting off a response before the full idea
+# is expressed.
 
 # --- System Messages and Personas ---
 # Q1
@@ -122,6 +125,7 @@ def get_completion(prompt: str, model="gpt-4o-mini", temperature=0):
         temperature=temperature,
     )
     return response.choices[0].message.content
+
 reviews = [
     "The onboarding process was smooth and the team was welcoming.",
     "The software crashes constantly and support never responds.",
@@ -134,7 +138,7 @@ Classify the sentiment of each review below as positive, negative, or mixed. Lab
 prompt += "\n".join([f"Review: {review}" for review in reviews])
 
 response = get_completion(prompt)
-print(f"Result: {response}")
+print(f"Zero-shot result: {response}")
 
 # Q2
 prompt = """
@@ -145,10 +149,10 @@ Review: Fast shipping but the item arrived damaged." Sentiment: mixed
 
 prompt += "\n".join([f"Review: {review}" for review in reviews])
 response = get_completion(prompt)
-print(f"Result_2: {response}")
+print(f"One-shot result: {response}")
 
 # Comments:
-# The second prompt is more specific about the output format, which can help ensure that the model 
+# The One-shot result is more specific about the output format, which can help ensure that the model 
 # provides the results in a consistent and expected manner. This is an example of prompt engineering, 
 # where we refine the prompt to guide the model's output more effectively.
 
@@ -171,10 +175,10 @@ Now classify these:
 
 prompt += "\n".join([f"Review: {review}" for review in reviews])
 response = get_completion(prompt)
-print(f"Result_3: {response}")
+print(f"Few-shot result: {response}")
 
 # Comments:
-# The third prompt includes examples of how to classify sentiments, which can help the model understand the
+# The few-shot result includes examples of how to classify sentiments, which can help the model understand the
 # task better and produce more accurate results but in our case, I would go with the second prompt over third one because 
 # it's not that necessary to provide examples for such a simple task. 
 # The second prompt is more concise and still provides clear instructions for the model to follow.
