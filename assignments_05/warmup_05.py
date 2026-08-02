@@ -54,9 +54,13 @@ response = client.chat.completions.create(
     temperature=1.0
 )
 
-print("Responses for API Q3:")
+print(f"API Q3 -- requested n={3} completions for the same prompt:")
+print(f"Total completions returned: {len(response.choices)}\n")
+
 for i, choice in enumerate(response.choices, start=1):
-    print(f"Response {i}: {choice.message.content}")
+    print(f"--- Completion {i} of {len(response.choices)} ---")
+    print(choice.message.content)
+    print()
     
 # Comments:
 # n=3 requests three independent completions for the same prompt in a single
@@ -204,10 +208,24 @@ print(f"Few-shot result: {response}")
 
 # Comments:
 # The few-shot result includes examples of how to classify sentiments, which can help the model understand the
-# task better and produce more accurate results but in our case, I would go with the second prompt over third one because 
-# it's not that necessary to provide examples for such a simple task. 
-# The second prompt is more concise and still provides clear instructions for the model to follow.
+# task better and produce more accurate results but in our case. 
 
+# When to choose each:
+# - Zero-shot: best for simple, unambiguous tasks where the model already
+#   understands the categories well and output format isn't strict - fastest
+#   and cheapest, since no example tokens are spent.
+# - One-shot: best when you mainly need to lock in a specific OUTPUT FORMAT
+#   (e.g., feeding results into a parser downstream) but the classification
+#   task itself is easy enough not to need multiple demonstrations.
+#   Best when you mainly need to lock in a specific OUTPUT FORMAT (e.g.,
+#   feeding results into a parser downstream) but the classification task
+#   itself is easy enough not to need multiple demonstrations.
+# - Few-shot: best when categories are ambiguous, imbalanced, or easily
+#   confused (e.g., distinguishing "mixed" from "negative" for a backhanded
+#   compliment), since seeing one example per class anchors the model to a
+#   concrete boundary for each. Costs more tokens per call, which matters at
+#   scale, but reduces variance on harder or more subjective classification
+#   tasks.
 
 
 # Q4 -- Chain-of-thought reasoning with a labeled final answer
@@ -225,6 +243,7 @@ print(response)
 # understanding how the model arrived at its final answer. This is particularly useful for complex problems
 # where the reasoning process is important to verify the correctness of the answer. The final answer is
 # clearly labeled, making it easy to identify the result of the calculations.
+
 
 # Q5 -- Structured JSON output with sentiment, confidence, and reason
 
