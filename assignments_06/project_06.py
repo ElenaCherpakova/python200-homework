@@ -32,7 +32,7 @@ print("--------Step 3: Build the Index--------")
 index = VectorStoreIndex.from_documents(docs)
 query_engine = index.as_query_engine(similarity_top_k=3)
 
-print("Vector index created successfully.")
+print("Vector index created successfully. Ready to answer questions.")
 print(f"Number of documents indexed: {len(docs)}")
 print("Indexed files:")
 
