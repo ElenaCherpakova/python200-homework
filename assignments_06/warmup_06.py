@@ -181,7 +181,8 @@ for q in questions:
         print("-" * 30)
         
 # Comments:
-# The 1st retrieved chunk i highly relevant because it specifically describes the company benefits program and has a high 
+# Employee benefits:
+# The first retrieved chunk is highly relevant because it specifically describes the company benefits program and has a high 
 # similarity score of 0.9086. The other retrieved chunks are less relevant because they discuss
 # the company's overview and security.
 
@@ -190,7 +191,8 @@ for q in questions:
 # An unexpected result is that the security and general overview chunks were also retrieved,
 # even though they are not directly related to employee benefits.
 
-# Security policies: The first retrieved chunk is highly relevant because it is specifically 
+# Security policies: 
+# The first retrieved chunk is highly relevant because it is specifically 
 # about Network and Data Security and has a similarity score of 0.8838. 
 # The benefits and general overview chunks are less relevant. 
 # The model's response sounds very confident and specific. It provides 

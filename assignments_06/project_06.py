@@ -21,7 +21,7 @@ print(f"Number of documents loaded: {len(docs)}\n")
 
 print(f"The file name of each document:")
 for doc in docs:
-    print(doc.metadata['file_name'])
+    print(f"File name: doc.metadata['file_name']")
 
 
 # Step 3: Build the Index and Query Engine
@@ -48,9 +48,9 @@ for q in questions:
     print("A:", response)
 
     top_node = response.source_nodes[0]
-    print(f"Document: {top_node.node.metadata['file_name']}")
+    print(f"Document name: {top_node.node.metadata['file_name']}")
     print(f"Similarity Score: {top_node.score:.4f}")
-    print(f"Text Snippet: {top_node.node.get_content()[:200]}...")
+    print(f"Text Snippet (first 200 characters): {top_node.node.get_content()[:200]}...")
     print("-" * 30)
         
         
