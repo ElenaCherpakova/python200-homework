@@ -35,32 +35,32 @@ else:
 
 # Concepts Q3
 # steps = [
-#     # 1. Extract text from source documents
-#     #    Read and extract the relevant text from the documents or webpages.
+#     "Extract text from source documents",
+#     # Read and extract the relevant text from the documents or webpages.
 #
-#     # 2. Split text into chunks
-#     #    Break the extracted text into smaller pieces so they can be searched.
+#     "Split text into chunks",
+#     # Break the extracted text into smaller pieces so they can be searched.
 #
-#     # 3. Convert text chunks into embeddings
-#     #    Convert each text chunk into a numerical vector that represents its meaning.
+#     "Convert text chunks into embeddings",
+#     # Convert each text chunk into a numerical vector that represents its meaning.
 #
-#     # 4. Receive the user's query
-#     #    The system receives the user's question or request.
+#     "Receive the user's query",
+#     # The system receives the user's question or request.
 #
-#     # 5. Embed the user's query
-#     #    Convert the user's question into a vector using the same embedding method.
+#     "Embed the user's query",
+#     # Convert the user's question into a vector using the same embedding method.
 #
-#     # 6. Retrieve the most relevant chunks
-#     #    Compare the query embedding with the document embeddings and find the
-#     #    most relevant chunks.
+#     "Retrieve the most relevant chunks",
+#     # Compare the query embedding with the document embeddings and find the
+#     # most relevant chunks.
 #
-#     # 7. Inject retrieved chunks into the prompt
-#     #    Add the retrieved information to the prompt so the LLM has relevant
-#     #    source material.
+#     "Inject retrieved chunks into the prompt",
+#     # Add the retrieved information to the prompt so the LLM has relevant
+#     # source material.
 #
-#     # 8. Generate a response from the LLM
-#     #    The LLM uses the user's question and the retrieved context to generate
-#     #    an answer.
+#     "Generate a response from the LLM",
+#     # The LLM uses the user's question and the retrieved context to generate
+#     # an answer.
 # ]
 
 
