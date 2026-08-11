@@ -86,7 +86,7 @@ q = "What is Groundwork Coffee's revenue for 2025?"
 response = query_engine.query(q)
 print("Q:", q)
 print("A:", response)
-for i, node_with_score in enumerate(response.source_nodes[:3], start=1):
+for i, node_with_score in enumerate(response.source_nodes, start=1):
     print(f"\nSource Node {i}:")
     print(f"Document: {node_with_score.node.metadata['file_name']}")
     print(f"Similarity Score: {node_with_score.score:.4f}")
