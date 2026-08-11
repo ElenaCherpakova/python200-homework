@@ -9,59 +9,70 @@ if load_dotenv():
 else:
     print("Warning: could not load API key. Check your .env file.")
 # --- RAG Concepts --- 
+
 # Concepts Q1
-
-# Comments:
-# Scenario A: RAG is a great approach for this scenario. We would store hundreds of PDFs in a document store and 
-# retrieve the relevant information when the user asks a question.
-# That retrieved content then can be injected into the LLM prompt, allowing the model to answer questions using the most up-to-date
-# information from the intenal policy library.
-
-# Scenario B: Fune-tuning is a great approach for this scenario. Since it's required to write product copy in a very specific brand voice,
-# fine-tuning can help the model learn and consistently reproduce that style. The 3,000 examples provide enough training
-# data for the model to learn patterns that may be difficult to express through prompting alone.
-
-# Scenario C: For this case, prompt engineering is the great approach. Because the user only needs a single short report
-# there is no need to fine-tune a model or build RAG system. We can simply include the report in the prompt and instruct the LLM
-# to answer questions based on its contents. 
+# Scenario A:
+# RAG is the best approach because the assistant needs to answer questions
+# using hundreds of internal PDFs that are updated regularly. RAG can retrieve
+# the relevant information from the current policy documents without retraining
+# the model every time the documents change.
+#
+# Scenario B:
+# Fine-tuning is the best approach because the main goal is to consistently
+# generate product descriptions in a specific brand voice. The 3,000 examples
+# can help the model learn the company's writing style and patterns.
+#
+# Scenario C:
+# Prompt engineering is the best approach because the user only needs answers
+# from one short report. The report can simply be included in the prompt, so
+# there is no need to build a RAG system or fine-tune the model.
 
 
 # Concepts Q2
-# A confidently wrong answer can be more harmful than saying "Im not sure" because people are more likely to trust and act
-# on an answer that sounds certain. Since AI is increasingly used in many areas of sociaty, a hallucination can have serious
-# consequences. For example, if an AI assistant confident gives incorrect medical advice, someone might follow it and put their
-# health at risk. The tone also matters because a confident and authoritative response makes the information seem more reliable, 
-# even when it is incorrect.
+# A confidently wrong answer can be more harmful than saying "I'm not sure"
+# because people are more likely to trust and act on an answer that sounds
+# certain. For example, incorrect medical information could cause someone to
+# make an unsafe decision. A confident tone can make incorrect information
+# appear more reliable than it actually is.
 
 # Concepts Q3
 # steps = [
-#     "Extract text from source documents",
-#     # Read and extract the relevant text from the documents or webpages.
-#
-#     "Split text into chunks",
-#     # Break the extracted text into smaller pieces so they can be searched.
-#
-#     "Convert text chunks into embeddings",
-#     # Convert each text chunk into a numerical vector that represents its meaning.
-#
-#     "Receive the user's query",
-#     # The system receives the user's question or request.
-#
-#     "Embed the user's query",
-#     # Convert the user's question into a vector using the same embedding method.
-#
-#     "Retrieve the most relevant chunks",
-#     # Compare the query embedding with the document embeddings and find the
-#     # most relevant chunks.
-#
-#     "Inject retrieved chunks into the prompt",
-#     # Add the retrieved information to the prompt so the LLM has relevant
-#     # source material.
-#
 #     "Generate a response from the LLM",
-#     # The LLM uses the user's question and the retrieved context to generate
-#     # an answer.
+#     "Extract text from source documents",
+#     "Receive the user's query",
+#     "Retrieve the most relevant chunks",
+#     "Convert text chunks into embeddings",
+#     "Inject retrieved chunks into the prompt",
+#     "Split text into chunks",
+#     "Embed the user's query",
 # ]
+#
+# 1. Extract text from source documents
+#    Read and extract the relevant text from the documents or webpages.
+#
+# 2. Split text into chunks
+#    Break the extracted text into smaller pieces so they can be searched.
+#
+# 3. Convert text chunks into embeddings
+#    Convert each text chunk into a numerical vector that represents its meaning.
+#
+# 4. Receive the user's query
+#    The system receives the user's question or request.
+#
+# 5. Embed the user's query
+#    Convert the user's question into a vector using the same embedding method.
+#
+# 6. Retrieve the most relevant chunks
+#    Compare the query embedding with the document embeddings and find the
+#    most relevant chunks.
+#
+# 7. Inject retrieved chunks into the prompt
+#    Add the retrieved information to the prompt so the LLM has relevant
+#    source material.
+#
+# 8. Generate a response from the LLM
+#    The LLM uses the user's question and the retrieved context to generate
+#    an answer.
 
 
 # Keyword RAG
@@ -154,24 +165,27 @@ print(output_3)
 
 
 # Semantic RAG Concepts
+
 # Q1
-# 1. A vector embedding is when text is converted into a set of numbers that represents its meaning. 
-# The text can be split into chunksm and each chunk can be converted into a vector and stored into a vector database. 
-# so it can later be searching by meaning.
-# 2. The chunk with a cosine similarity of 0.85 is more relevant because it is much close to 1 than 0.30.
-# A higher similarity score means that the two texts have a more similar meaning or are more closely related in the embedding space.
-# 3. Semantic search is more sophisticated because it looks at the overall meaning of the text rather than mathching words one by one.
-# This allows it to find relevant chunks even when the exact words from the query do not appear in the chunk, as long as the meaning are similar.
+# 1. A vector embedding converts text into a set of numbers that represents
+#    the meaning of the text. These vectors can be stored and searched later.
+#
+# 2. The chunk with a cosine similarity of 0.85 is more relevant because 0.85
+#    is closer to 1 than 0.30. A higher similarity score means the two texts
+#    have more similar meanings.
+#
+# 3. Semantic search looks at the meaning of the text instead of only matching
+#    exact words. This allows it to find relevant information even when the
+#    query and document use different words.
 
 # Q2
-
-# | Feature                    | Keyword RAG                       | Semantic RAG |
-# |----------------------------|-----------------------------------|--------------|
-# | What is compared?          | Exact word overlap                | Meaning/vector embedding|
-# | What is retrieved?         | Full document                     | Relevent chunks|
-# | Can it handle synonyms?    | No                                | Yes            |
-# | Storage format             | Plain text dictionary             | Vector Database|
-# | Relevance score            | Number of overlapping keywords    | Cosine similarity score |
+# | Feature          | Keyword RAG              | Semantic RAG              |
+# |------------------|--------------------------|---------------------------|
+# | What is compared?| Exact word overlap       | Meaning/vector embeddings |
+# | What is retrieved?| Matching documents       | Relevant chunks          |
+# | Synonyms?        | Usually no               | Yes                       |
+# | Storage format   | Plain text               | Vector index/database     |
+# | Relevance score  | Keyword overlap count    | Similarity score          |
 
 # LlamaIndex
 docs = SimpleDirectoryReader("../../../python-200-v1/lessons/06_AI_augmentation/resources/brightleaf_pdfs").load_data()
@@ -190,11 +204,12 @@ for q in questions:
     response = query_engine.query(q)
     print("A:", response)
     
-    for node_with_score in response.source_nodes:
+    print("Retrieved Sources:")
+    for i, node_with_score in enumerate(response.source_nodes[:3], start=1):
+        print(f"Source {i}:")
         print(f"Document: {node_with_score.node.metadata['file_name']}")
-        print(f"Node ID: {node_with_score.node.node_id}")
         print(f"Similarity Score: {node_with_score.score:.4f}")
-        print(f"Text Snippet: {node_with_score.node.get_content()[:150]}...")
+        print(f"Text Snippet: {node_with_score.node.get_content()[:150]}")
         print("-" * 30)
         
 # Comments:
@@ -222,82 +237,79 @@ for q in questions:
 # related to the question, but not always perfectly relevant.
 
 # Q2
+q = "What employee benefits does BrightLeaf offer?"
+
+query_engine_1 = index.as_query_engine(similarity_top_k=1)
+query_engine_5 = index.as_query_engine(similarity_top_k=5)
 
 print("------------------similarity_top_k=1---------------------")
-query_engine_2 = index.as_query_engine(similarity_top_k=1)
 
-for q in questions:
-    print(f"\nQ: {q}")
-    response = query_engine_2.query(q)
-    print("A:", response)
-    
-    for node_with_score in response.source_nodes:
-        print(f"Document: {node_with_score.node.metadata['file_name']}")
-        print(f"Node ID: {node_with_score.node.node_id}")
-        print(f"Similarity Score: {node_with_score.score:.4f}")
-        print(f"Text Snippet: {node_with_score.node.get_content()[:150]}...")
-        print("-" * 30)
-        
-    query_engine_2 = index.as_query_engine(similarity_top_k=1)
+response_1 = query_engine_1.query(q)
 
-query_engine_3 = index.as_query_engine(similarity_top_k=5)
+print(f"Q: {q}")
+print("A:", response_1)
+
+for i, node_with_score in enumerate(response_1.source_nodes, start=1):
+    print(f"Source {i}:")
+    print(f"Document: {node_with_score.node.metadata['file_name']}")
+    print(f"Similarity Score: {node_with_score.score:.4f}")
+    print(f"Text Snippet: {node_with_score.node.get_content()[:150]}")
+    print("-" * 30)
 
 
 print("------------------similarity_top_k=5---------------------")
-for q in questions:
-    print(f"\nQ: {q}")
-    response = query_engine_3.query(q)
-    print("A:", response)
-    
-    for node_with_score in response.source_nodes:
-        print(f"Document: {node_with_score.node.metadata['file_name']}")
-        print(f"Node ID: {node_with_score.node.node_id}")
-        print(f"Similarity Score: {node_with_score.score:.4f}")
-        print(f"Text Snippet: {node_with_score.node.get_content()[:150]}...")
-        print("-" * 30)
+
+response_5 = query_engine_5.query(q)
+
+print(f"Q: {q}")
+print("A:", response_5)
+
+for i, node_with_score in enumerate(response_5.source_nodes, start=1):
+    print(f"Source {i}:")
+    print(f"Document: {node_with_score.node.metadata['file_name']}")
+    print(f"Similarity Score: {node_with_score.score:.4f}")
+    print(f"Text Snippet: {node_with_score.node.get_content()[:150]}")
+    print("-" * 30)
+
 
 # Comments:
-# With similarity_top_k=1, the model received only the most relevant chunk 
-# for each question. The responses were already accurate and focused because 
-# the retrieved context was directly related to the question. 
-# With similarity_top_k=5, the responses remained mostly correct and became 
-# slightly more detailed, but the model also received several less relevant 
-# chunks. For example, the security question also retrieved benefits, 
-# company overview, partnership, and financial report chunks.
-# This shows that more retrieved context is not always better. Additional
-# context can provide useful information, but irrelevant chunks can also
-# distract the model or increase the chance of an incorrect or hallucinated 
-# response. The goal is to retrieve enough relevant context, not simply as 
-# much context as possible.
+# With similarity_top_k=1, the model receives only the most relevant chunk,
+# so the response is more focused.
+#
+# With similarity_top_k=5, the model receives more context. This can provide
+# additional useful information, but it can also include less relevant chunks.
+#
+# Comparing the same question with top_k=1 and top_k=5 shows that retrieving
+# more chunks does not always mean getting a better answer.
 
 # Q3
 print("----------------LlamaIndex Question 3--------------")
+
 query_4 = "What are the biggest challenges BrightLeaf will face in the future?"
 response = query_engine.query(query_4)
 print("A:", response)
-for node_with_score in response.source_nodes:
-        print(f"Node ID: {node_with_score.node.node_id}")
-        print(f"Similarity Score: {node_with_score.score:.4f}")
-        print(f"Text Snippet: {node_with_score.node.get_content()[:150]}...")
-        print("-" * 30)
-        
+for i, node_with_score in enumerate(response.source_nodes, start=1):
+    print(f"Document: {node_with_score.node.metadata['file_name']}")
+    print(f"Node ID: {node_with_score.node.node_id}")
+    print(f"Similarity Score: {node_with_score.score:.4f}")
+    print(f"Text Snippet: {node_with_score.node.get_content()[:150]}...")
+    print("-" * 30)
+
 # Comments:
 # I expected this query to be difficult because the documents contain
-# information about the company's past and current activities, but they do not
+# information about BrightLeaf's past and current activities, but they do not
 # provide reliable information about the company's future.
 #
-# The model still gave a confident and specific answer about future challenges
-# and strategies, even though the retrieved chunks were mostly about the
-# company's overview, a 2022 partnership, and financial performance from
-# 2021-2025.
+# The model still gave a confident answer about future challenges even though
+# the retrieved information was mostly about the company's overview,
+# partnership, and financial performance.
 #
-# This suggests that the model may have generated information that was not
-# directly supported by the retrieved context.
+# This suggests that the model may generate information that is not directly
+# supported by the retrieved context.
 #
-# To handle this better, I would add a relevance threshold or a check to make
-# sure the retrieved context actually supports the answer. The model should
-# also be instructed to say that there is not enough information when the
-# documents do not contain an answer, instead of making unsupported predictions.
+# To improve the system, I would add a relevance threshold and instruct the
+# model to say that there is not enough information when the documents do not
+# contain an answer. This would reduce unsupported answers.
 
 # Q4
 
