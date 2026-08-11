@@ -13,36 +13,36 @@ else:
 # --- RAG Concepts --- 
 # Concepts Q1
 #
-print("""Scenario A:
-RAG is the best approach because the assistant needs to answer questions
-using hundreds of internal PDFs that are updated regularly. RAG can retrieve
-current information from the policy documents without retraining the model
-every time the documents change.
+# Scenario A:
+# RAG is the best approach because the assistant needs to answer questions
+# using hundreds of internal PDFs that are updated regularly. RAG can retrieve
+# current information from the policy documents without retraining the model
+# every time the documents change.
 
-Scenario B:
-Fine-tuning is the best approach because the goal is to consistently
-generate product descriptions in a specific brand voice. The 3,000 examples
-can help the model learn and reproduce the company's writing style.
+# Scenario B:
+# Fine-tuning is the best approach because the goal is to consistently
+# generate product descriptions in a specific brand voice. The 3,000 examples
+# can help the model learn and reproduce the company's writing style.
 
 # Scenario C: For this case, prompt engineering is the great approach. Since analyst only needs to work with a single 2-page report
 # there is no need to fine-tune a model or build RAG system. We can simply include the report in the prompt and instruct the LLM
 # to answer questions based on its contents. 
 
-Concepts Q2
+# Concepts Q2
 
-A confidently wrong answer can be more harmful than saying "I'm not sure"
-because people are more likely to trust and act on an answer that sounds
-certain.
+# A confidently wrong answer can be more harmful than saying "I'm not sure"
+# because people are more likely to trust and act on an answer that sounds
+# certain.
 
-For example, if an AI assistant incorrectly tells someone that a certain
-medication can safely be combined with another medication, the person might
-follow that advice and experience a serious health problem.
+# For example, if an AI assistant incorrectly tells someone that a certain
+# medication can safely be combined with another medication, the person might
+# follow that advice and experience a serious health problem.
 
-Tone affects trust because a confident and authoritative tone can make
-incorrect information sound reliable. This can cause users to trust and act
-on a hallucinated answer instead of checking the information with a reliable
-source or qualified professional.
-""")
+# Tone affects trust because a confident and authoritative tone can make
+# incorrect information sound reliable. This can cause users to trust and act
+# on a hallucinated answer instead of checking the information with a reliable
+# source or qualified professional.
+
 # Concepts Q3
 
 # steps = [
