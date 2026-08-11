@@ -13,37 +13,37 @@ else:
 # --- RAG Concepts --- 
 # Concepts Q1
 #
-# Scenario A:
-# RAG is the best approach because the assistant needs to answer questions
-# using hundreds of internal PDFs that are updated regularly. RAG can retrieve
-# current information from the policy documents without retraining the model
-# every time the documents change.
-#
-# Scenario B:
-# Fine-tuning is the best approach because the goal is to consistently
-# generate product descriptions in a specific brand voice. The 3,000 examples
-# can help the model learn and reproduce the company's writing style.
-#
-# Scenario C:
-# RAG is the best approach because the assistant only needs to answer questions
-# about one specific two-page report. The report can be retrieved and provided
-# as context to the model without training the model on the document's content.
+print("""Scenario A:
+RAG is the best approach because the assistant needs to answer questions
+using hundreds of internal PDFs that are updated regularly. RAG can retrieve
+current information from the policy documents without retraining the model
+every time the documents change.
 
-# Concepts Q2
-#
-# A confidently wrong answer can be more harmful than saying "I'm not sure"
-# because people are more likely to trust and act on an answer that sounds
-# certain.
-#
-# For example, if an AI assistant incorrectly tells someone that a certain
-# medication can safely be combined with another medication, the person might
-# follow that advice and experience a serious health problem.
-#
-# Tone affects trust because a confident and authoritative tone can make
-# incorrect information sound reliable. This can cause users to trust and act
-# on a hallucinated answer instead of checking the information with a reliable
-# source or qualified professional.
+Scenario B:
+Fine-tuning is the best approach because the goal is to consistently
+generate product descriptions in a specific brand voice. The 3,000 examples
+can help the model learn and reproduce the company's writing style.
 
+Scenario C:
+RAG is the best approach because the assistant only needs to answer questions
+about one specific two-page report. The report can be retrieved and provided
+as context to the model without training the model on the document's content.
+
+Concepts Q2
+
+A confidently wrong answer can be more harmful than saying "I'm not sure"
+because people are more likely to trust and act on an answer that sounds
+certain.
+
+For example, if an AI assistant incorrectly tells someone that a certain
+medication can safely be combined with another medication, the person might
+follow that advice and experience a serious health problem.
+
+Tone affects trust because a confident and authoritative tone can make
+incorrect information sound reliable. This can cause users to trust and act
+on a hallucinated answer instead of checking the information with a reliable
+source or qualified professional.
+""")
 # Concepts Q3
 
 # steps = [
@@ -157,19 +157,20 @@ output_2 = simple_keyword_retrieval(query_2, documents, verbose=True)
 print(output_2)
 
 # Comments:
-# No relevant document was selected because none of the filtered query words
-# overlapped with the document text. The function therefore returned
-# "None found" instead of selecting menu.txt.
-#
-# This shows a limitation of keyword retrieval. The menu document contains
-# drinks that could be relevant to a question about caffeine, but it does not
-# contain the exact word "caffeine". Keyword retrieval only matches words and
-# does not understand that some drinks may be caffeine-free or related to the
-# concept of caffeine.
-#
-# Semantic retrieval would work better because embeddings compare the meaning
-# of the query with the meaning of the document, even when the exact keywords
-# are different.
+print("""No relevant document was selected because none of the filtered query words
+overlapped with the document text. The function therefore returned
+"None found" instead of selecting menu.txt.
+
+This shows a limitation of keyword retrieval. The menu document contains
+drinks that could be relevant to a question about caffeine, but it does not
+contain the exact word "caffeine". Keyword retrieval only matches words and
+does not understand that some drinks may be caffeine-free or related to the
+concept of caffeine.
+
+Semantic retrieval would work better because embeddings compare the meaning
+of the query with the meaning of the document, even when the exact keywords
+are different.""")
+
 
 # Keyword Q3
 query_3 = "How do I sign up for rewards?"
@@ -349,7 +350,7 @@ for i, node_with_score in enumerate(response.source_nodes, start=1):
 
 print("----------------LlamaIndex Question 4--------------")
 
-llm = OpenAI(model="gpt-4o-mini", temperature=0.2)
+llm = OpenAI(model="gpt-4o-mini")
 
 # Define evaluator
 faithfulness_evaluator = FaithfulnessEvaluator(llm=llm)
