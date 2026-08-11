@@ -35,22 +35,32 @@ else:
 
 # Concepts Q3
 # steps = [
-# 1. "Extract text from source documents",  
-# - Read and extract the relevant text from documents or webpage
-# 2. "Split text into chunks" 
-# - Break the exctracted text into smaller pieces so they can be searchable
-# 3. "Convert text chunks into embeddings" 
-# - Convert each text chunk into a numerical vector that represents its meaning
-# 4. "Receive the user's query" 
-# - The system receives the question or request from the user
-# 5. "Embed the user's query" 
-# - Convert the user's question into a vector using the same embedding method
-# 6. "Retrieve the most relevant chunks" 
-# - Compare the query embedding with the document embeddings and find the most relevent chunks
-# 7. "Inject retrieved chunks into the prompt" 
-# - Add the retrieved information to the prompt so the LLM has relevant source material.
-# 8. "Generate a response from the LLM" 
-# -  The LLM uses the user's question and the retrieved context to generate an answer.
+#     # 1. Extract text from source documents
+#     #    Read and extract the relevant text from the documents or webpages.
+#
+#     # 2. Split text into chunks
+#     #    Break the extracted text into smaller pieces so they can be searched.
+#
+#     # 3. Convert text chunks into embeddings
+#     #    Convert each text chunk into a numerical vector that represents its meaning.
+#
+#     # 4. Receive the user's query
+#     #    The system receives the user's question or request.
+#
+#     # 5. Embed the user's query
+#     #    Convert the user's question into a vector using the same embedding method.
+#
+#     # 6. Retrieve the most relevant chunks
+#     #    Compare the query embedding with the document embeddings and find the
+#     #    most relevant chunks.
+#
+#     # 7. Inject retrieved chunks into the prompt
+#     #    Add the retrieved information to the prompt so the LLM has relevant
+#     #    source material.
+#
+#     # 8. Generate a response from the LLM
+#     #    The LLM uses the user's question and the retrieved context to generate
+#     #    an answer.
 # ]
 
 
@@ -107,7 +117,7 @@ documents = {
     "loyalty.txt": "Join our loyalty program to earn one point per dollar spent. Redeem 100 points for a free drink of your choice.",
 }
 output = simple_keyword_retrieval(query, documents, verbose=True)
-print(output)
+print("Selected document:", output[0][0])
 
 # Comments:
 # The selected document is hours.txt because it has the highest overlap score
@@ -181,31 +191,35 @@ for q in questions:
     print("A:", response)
     
     for node_with_score in response.source_nodes:
+        print(f"Document: {node_with_score.node.metadata['file_name']}")
         print(f"Node ID: {node_with_score.node.node_id}")
         print(f"Similarity Score: {node_with_score.score:.4f}")
         print(f"Text Snippet: {node_with_score.node.get_content()[:150]}...")
         print("-" * 30)
         
 # Comments:
+#
 # Employee benefits:
-# The first retrieved chunk is highly relevant because it specifically describes the company benefits program and has a high 
-# similarity score of 0.9086. The other retrieved chunks are less relevant because they discuss
+# The first retrieved chunk is highly relevant because it specifically
+# describes the company benefits program and has a high similarity score of
+# 0.9086. The other retrieved chunks are less relevant because they discuss
 # the company's overview and security.
-
-# The model's response sounds confident and specific. It lists many different benefits without using 
-# phrases like "Im not sure" or "based on the context"
-# An unexpected result is that the security and general overview chunks were also retrieved,
-# even though they are not directly related to employee benefits.
-
-# Security policies: 
-# The first retrieved chunk is highly relevant because it is specifically 
-# about Network and Data Security and has a similarity score of 0.8838. 
-# The benefits and general overview chunks are less relevant. 
-# The model's response sounds very confident and specific. It provides 
-# detailed security information without any uncertainty or hedging. 
-# An unexpected result is that the benefits chunk was also retrieved. 
-# This shows that semantic retrieval can return chunks that are only 
-# somewhat related to the query rather than perfectly relevant.
+#
+# The model's response sounds confident and specific. It lists several
+# benefits without showing uncertainty. An unexpected result is that the
+# security and general overview chunks were also retrieved, even though they
+# are not directly related to employee benefits.
+#
+# Security policies:
+# The first retrieved chunk is highly relevant because it specifically
+# discusses Network and Data Security and has a similarity score of 0.8838.
+# The benefits and general overview chunks are less relevant to this question.
+#
+# The model's response also sounds confident and specific. It provides
+# detailed security information without showing much uncertainty. An
+# unexpected result is that the employee benefits chunk was also retrieved.
+# This shows that semantic retrieval can return chunks that are somewhat
+# related to the question, but not always perfectly relevant.
 
 # Q2
 
@@ -218,6 +232,7 @@ for q in questions:
     print("A:", response)
     
     for node_with_score in response.source_nodes:
+        print(f"Document: {node_with_score.node.metadata['file_name']}")
         print(f"Node ID: {node_with_score.node.node_id}")
         print(f"Similarity Score: {node_with_score.score:.4f}")
         print(f"Text Snippet: {node_with_score.node.get_content()[:150]}...")
@@ -235,6 +250,7 @@ for q in questions:
     print("A:", response)
     
     for node_with_score in response.source_nodes:
+        print(f"Document: {node_with_score.node.metadata['file_name']}")
         print(f"Node ID: {node_with_score.node.node_id}")
         print(f"Similarity Score: {node_with_score.score:.4f}")
         print(f"Text Snippet: {node_with_score.node.get_content()[:150]}...")
