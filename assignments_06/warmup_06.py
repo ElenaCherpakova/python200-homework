@@ -46,49 +46,15 @@ source or qualified professional.
 # Concepts Q3
 
 # steps = [
-#     "Generate a response from the LLM",
-#     "Extract text from source documents",
-#     "Receive the user's query",
-#     "Retrieve the most relevant chunks",
-#     "Convert text chunks into embeddings",
-#     "Inject retrieved chunks into the prompt",
-#     "Split text into chunks",
-#     "Embed the user's query",
+#     "Extract text from source documents" - Read and extract the relevant text from the documents or webpages.
+#     "Split text into chunks" - Break the extracted text into smaller pieces so they can be searched efficiently.,
+#     "Convert text chunks into embeddings" - Convert each text chunk into a numerical vector that represents its meaning.,
+#     "Receive the user's query" -  The system receives the user's question or request.,
+#     "Embed the user's query" - Convert the user's question into a vector using the same embedding method,
+#     "Retrieve the most relevant chunks" - Compare the query embedding with the document embeddings and find the most relevant chunks.,
+#     "Inject retrieved chunks into the prompt" -  Add the retrieved chunks to the prompt so the LLM has relevant source material.,
+#     "Generate a response from the LLM" - The LLM uses the user's question and retrieved context to generate an answer.,
 # ]
-# arranged_steps = [
-#     "Extract text from source documents",
-#     "Split text into chunks",
-#     "Convert text chunks into embeddings",
-#     "Receive the user's query",
-#     "Embed the user's query",
-#     "Retrieve the most relevant chunks",
-#     "Inject retrieved chunks into the prompt",
-#     "Generate a response from the LLM",
-# ]
-#
-# 1. Extract text from source documents
-# Read and extract the relevant text from the documents or webpages.
-#
-# 2. Split text into chunks
-# Break the extracted text into smaller pieces so they can be searched efficiently.
-#
-# 3. Convert text chunks into embeddings
-# Convert each text chunk into a numerical vector that represents its meaning.
-#
-# 4. Receive the user's query
-# The system receives the user's question or request.
-#
-# 5. Embed the user's query
-# Convert the user's question into a vector using the same embedding method.
-#
-# 6. Retrieve the most relevant chunks
-# Compare the query embedding with the document embeddings and find the most relevant chunks.
-#
-# 7. Inject retrieved chunks into the prompt
-# Add the retrieved chunks to the prompt so the LLM has relevant source material.
-#
-# 8. Generate a response from the LLM
-# The LLM uses the user's question and retrieved context to generate an answer.
 
 # Keyword RAG
 import string
