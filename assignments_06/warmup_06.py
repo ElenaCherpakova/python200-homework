@@ -24,10 +24,9 @@ Fine-tuning is the best approach because the goal is to consistently
 generate product descriptions in a specific brand voice. The 3,000 examples
 can help the model learn and reproduce the company's writing style.
 
-Scenario C:
-RAG is the best approach because the assistant only needs to answer questions
-about one specific two-page report. The report can be retrieved and provided
-as context to the model without training the model on the document's content.
+# Scenario C: For this case, prompt engineering is the great approach. Since analyst only needs to work with a single 2-page report
+# there is no need to fine-tune a model or build RAG system. We can simply include the report in the prompt and instruct the LLM
+# to answer questions based on its contents. 
 
 Concepts Q2
 
@@ -189,7 +188,6 @@ print(output_3)
 # different.
 
 # Semantic RAG Concepts
-
 # Q1
 # 1. A vector embedding converts text into a set of numbers that represents
 #    the meaning of the text. These vectors can be stored and searched later.
@@ -209,7 +207,7 @@ print(output_3)
 # | What is retrieved?| Matching documents       | Relevant chunks          |
 # | Synonyms?        | Usually no               | Yes                       |
 # | Storage format   | Plain text               | Vector index/database     |
-# | Relevance score  | Keyword overlap count    | Similarity score          |
+# | Relevance score  | Keyword overlap count    | Cosine Similarity score          |
 
 # LlamaIndex
 
