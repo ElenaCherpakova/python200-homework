@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+import os
 from llama_index.llms.openai import OpenAI
 from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
 from llama_index.core.evaluation import FaithfulnessEvaluator, RelevancyEvaluator
@@ -207,17 +208,21 @@ questions = [
     "What employee benefits does BrightLeaf offer?",
     "What are BrightLeaf's security policies?",
 ]
+
 for q in questions:
     print(f"\nQ: {q}")
     response = query_engine.query(q)
     print("A:", response)
-    
-    print("Retrieved Sources:")
+
+    print("Top 3 Retrieved Sources:")
     for i, node_with_score in enumerate(response.source_nodes[:3], start=1):
         print(f"Source {i}:")
         print(f"Document: {node_with_score.node.metadata['file_name']}")
         print(f"Similarity Score: {node_with_score.score:.4f}")
-        print(f"Text Snippet: {node_with_score.node.get_content()[:150]}")
+        print(
+            f"Text Snippet: "
+            f"{node_with_score.node.get_content()[:150]}..."
+        )
         print("-" * 30)
         
 # Comments:
@@ -281,24 +286,31 @@ for i, node_with_score in enumerate(response_5.source_nodes, start=1):
 
 
 # Comments:
+#
 # With similarity_top_k=1, the model receives only the most relevant chunk,
-# so the response is more focused.
+# so the response is more focused and uses less context.
 #
 # With similarity_top_k=5, the model receives more context. This can provide
 # additional useful information, but it can also include less relevant chunks.
 #
-# Comparing the same question with top_k=1 and top_k=5 shows that retrieving
-# more chunks does not always mean getting a better answer.
+# For this query, both settings produced a useful answer, but the top_k=1
+# result was more focused. This shows that retrieving more chunks does not
+# always mean getting a better answer.
 
 # Q3
 print("----------------LlamaIndex Question 3--------------")
 
 query_4 = "What are the biggest challenges BrightLeaf will face in the future?"
 response = query_engine.query(query_4)
+
+print("Q:", query_4)
 print("A:", response)
+
+print("Retrieved Sources:")
+
 for i, node_with_score in enumerate(response.source_nodes, start=1):
+    print(f"Source {i}:")
     print(f"Document: {node_with_score.node.metadata['file_name']}")
-    print(f"Node ID: {node_with_score.node.node_id}")
     print(f"Similarity Score: {node_with_score.score:.4f}")
     print(f"Text Snippet: {node_with_score.node.get_content()[:150]}...")
     print("-" * 30)
@@ -348,21 +360,24 @@ relevancy_result_2 = relevancy_evaluator.evaluate_response(query=q_2, response=r
 print("Relevancy Result 2: " + str(relevancy_result_2.score))
 
 # Comments:
-# A faithfulness score of 1.0 means the answer is supported by the retrieved
-# information. A score of 0.0 means the answer is not supported by the context.
 #
-# A relevancy score shows how well the answer relates to the question.
-# Faithfulness checks if the information is supported by the context, while
-# relevancy checks if the answer actually answers the question.
+# A faithfulness score of 1.0 means the answer is fully supported by the
+# retrieved information. A score of 0.0 means the answer is not supported
+# by the retrieved context.
+#
+# A relevancy score measures how well the answer addresses the user's question.
+# Faithfulness checks whether the answer is supported by the context, while
+# relevancy checks whether the answer is relevant to the question.
 #
 # The scores changed between the two queries. The first query had 1.0 for both
 # faithfulness and relevancy. The second query had 0.0 for faithfulness and
-# 1.0 for relevancy. This happened because the documents had information about
-# employee benefits, but did not have information about the company's stock
-# price. The answer was relevant to the question, but it was not supported by
-# the retrieved context.
+# 1.0 for relevancy. This happened because the documents contained information
+# about employee benefits but did not contain information about BrightLeaf's
+# current stock price. The response was relevant to the question, but it was
+# not supported by the retrieved context.
 #
 # LLM-as-a-judge means using another LLM to evaluate the generated answer.
-# It is useful for RAG because there can be different correct ways to answer
-# the same question, so a simple accuracy metric would not be enough. The LLM
-# can check if the answer is relevant and supported by the retrieved context.
+# It is useful for RAG because there can be multiple valid ways to answer a
+# question, so a simple exact-match accuracy metric would not work well.
+# The LLM judge can evaluate whether the answer is relevant and supported
+# by the retrieved context.

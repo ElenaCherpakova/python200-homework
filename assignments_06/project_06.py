@@ -78,9 +78,9 @@ print("Q:", q)
 print("A:", response)
 for i, node_with_score in enumerate(response.source_nodes[:3], start=1):
     print(f"\nSource Node {i}:")
-    print(f"Document: {top_node.node.metadata['file_name']}")
-    print(f"Similarity Score: {top_node.score:.4f}")
-    print(f"Text Snippet: {top_node.node.get_content()[:200]}...")
+    print(f"Document: {node_with_score.node.metadata['file_name']}")
+    print(f"Similarity Score: {node_with_score.score:.4f}")
+    print(f"Text Snippet: {node_with_score.node.get_content()[:200]}...")
     print("-" * 30)
 
 # Comments:
