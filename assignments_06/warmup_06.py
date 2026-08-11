@@ -45,7 +45,18 @@ else:
 # source or qualified professional.
 
 # Concepts Q3
+
 # steps = [
+#     "Generate a response from the LLM",
+#     "Extract text from source documents",
+#     "Receive the user's query",
+#     "Retrieve the most relevant chunks",
+#     "Convert text chunks into embeddings",
+#     "Inject retrieved chunks into the prompt",
+#     "Split text into chunks",
+#     "Embed the user's query",
+# ]
+# arranged_steps = [
 #     "Extract text from source documents",
 #     "Split text into chunks",
 #     "Convert text chunks into embeddings",

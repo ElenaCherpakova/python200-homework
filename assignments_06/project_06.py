@@ -14,24 +14,34 @@ else:
 docs_dir = Path("../../../python-200-v1/lessons/06_AI_augmentation/resources/groundwork_docs")
 assert docs_dir.exists(), f"Document directory not found: {docs_dir}"
 
-# Step 2: Load the Documents
+# Step 2: Load Documents
 print('--------- Step 2: Load the Documents------------')
 docs = SimpleDirectoryReader("../../../python-200-v1/lessons/06_AI_augmentation/resources/groundwork_docs").load_data()
 print(f"Number of documents loaded: {len(docs)}\n")
 
 print(f"The file name of each document:")
-for doc in docs:
-    print(f"File name: {doc.metadata['file_name']}")
+for i, doc in enumerate(docs, start=1):
+    print(f"Document {i}: {doc.metadata.get('file_name', 'Unknown')}")
+
+print("-" * 40)
 
 
-# Step 3: Build the Index and Query Engine
-print('----Step 3: Build the Index and Query Engine----')
+# Step 3: Build the Index
+print("--------Step 3: Build the Index--------")
+
 index = VectorStoreIndex.from_documents(docs)
-
 query_engine = index.as_query_engine(similarity_top_k=3)
-print('Index built successfully. Ready to answer questions.\n')
 
+print("Vector index created successfully.")
+print(f"Number of documents indexed: {len(docs)}")
+print("Indexed files:")
+
+for i, doc in enumerate(docs, start=1):
+    print(f"  {i}. {doc.metadata.get('file_name', 'Unknown')}")
+
+print("-" * 40)
 # Step 4: Query the Assistant
+
 print('----Step 4: Query the Assistant----')
 
 questions = [
