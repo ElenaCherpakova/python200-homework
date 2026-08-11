@@ -3,14 +3,14 @@ from pathlib import Path
 
 from llama_index.llms.openai import OpenAI
 from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
-from llama_index.core.evaluation import FaithfulnessEvaluator, RelevancyEvaluator
 
 # Step 1: Setup
 if load_dotenv():
     print("API key loaded successfully.")
 else:
     print("Warning: could not load API key. Check your .env file.")
-    
+
+
 docs_dir = Path("../../../python-200-v1/lessons/06_AI_augmentation/resources/groundwork_docs")
 assert docs_dir.exists(), f"Document directory not found: {docs_dir}"
 
