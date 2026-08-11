@@ -268,16 +268,22 @@ for node_with_score in response.source_nodes:
         print("-" * 30)
         
 # Comments:
-# I expected this query to be difficult because the documents contain information about the company past and current activities,
-# but they dont provide reliable information about the company's future.
-# The model still gave a confident and specific answer about future challenges and strategies, even 
-# though the retrieved chunks were mostly about the company's overview, a 2022 partnership and
-# financial performance from 2021-2025.
-# This suggests that the model may have generated information was not directly supported by the retrieved context.
-# And to handle it better, I would add a relevance threshold or a check to sure the retrieved context 
-# actually supports the answer.
-# The model should also be instructed to say that there is not enough information 
-# about the documents do not contain an answer, instead of making unsupported predictions.
+# I expected this query to be difficult because the documents contain
+# information about the company's past and current activities, but they do not
+# provide reliable information about the company's future.
+#
+# The model still gave a confident and specific answer about future challenges
+# and strategies, even though the retrieved chunks were mostly about the
+# company's overview, a 2022 partnership, and financial performance from
+# 2021-2025.
+#
+# This suggests that the model may have generated information that was not
+# directly supported by the retrieved context.
+#
+# To handle this better, I would add a relevance threshold or a check to make
+# sure the retrieved context actually supports the answer. The model should
+# also be instructed to say that there is not enough information when the
+# documents do not contain an answer, instead of making unsupported predictions.
 
 # Q4
 
@@ -308,17 +314,20 @@ relevancy_result_2 = relevancy_evaluator.evaluate_response(query=q_2, response=r
 print("Relevancy Result 2: " + str(relevancy_result_2.score))
 
 # Comments:
-# Faithfulness score of 1.0 means the answer is supported by the retrieved information.
-# A score of 0.0 means the answer is not supported by the context.
+# A faithfulness score of 1.0 means the answer is supported by the retrieved
+# information. A score of 0.0 means the answer is not supported by the context.
+#
 # A relevancy score shows how well the answer relates to the question.
-# Faithfulness checks if the information is supported by the context, while relevancy checks if the answer actually 
-# answers the question.
+# Faithfulness checks if the information is supported by the context, while
+# relevancy checks if the answer actually answers the question.
+#
 # The scores changed between the two queries. The first query had 1.0 for both
 # faithfulness and relevancy. The second query had 0.0 for faithfulness and
-# 1.0 for relevancy. This happened because the documents had information
-# about employee benefits, but did not have information about the company's
-# stock price. So the answer was relevant to the question, but it was not
-# supported by the retrieved context.
+# 1.0 for relevancy. This happened because the documents had information about
+# employee benefits, but did not have information about the company's stock
+# price. The answer was relevant to the question, but it was not supported by
+# the retrieved context.
+#
 # LLM-as-a-judge means using another LLM to evaluate the generated answer.
 # It is useful for RAG because there can be different correct ways to answer
 # the same question, so a simple accuracy metric would not be enough. The LLM

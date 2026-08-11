@@ -75,7 +75,7 @@ print(f"Similarity Score: {top_node.score:.4f}")
 print(f"Text Snippet: {top_node.node.get_content()[:200]}...")
 print("-" * 30)
 
-#Comments:
+# Comments:
 # I asked the model to provide the company's revenue for 2025 because this 
 # information was not expected to be in the provided documents, so I expected 
 # the assistant to struggle with the question.
