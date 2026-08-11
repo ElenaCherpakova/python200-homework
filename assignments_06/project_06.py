@@ -56,11 +56,18 @@ for q in questions:
         
 # Comments:
 # The assistant sounded confident and the answers were mostly accurate and
-# relevant to the questions. The retrieved documents also matched the topics
-# well. The answer about the loyalty program was especially detailed, and the
-# answer about how Groundwork started was supported by the our_story.txt file.
-# Nothing was too surprising because the answers were based on the provided
-# documents.
+# relevant for all five questions. The answers about the weekend hours, loyalty
+# program, company history, and catering/wholesale were clearly supported by
+# the retrieved documents.
+#
+# The dairy-free milk answer was a little surprising because the retrieved
+# document was seasonal_specials.txt instead of the main menu document. After
+# increasing the number of retrieved results, the relevant dairy-free
+# information appeared in the retrieved context.
+#
+# Overall, the results show that the assistant can give confident and useful
+# answers when the relevant information is available, but the retrieved source
+# should still be checked to make sure the answer is actually supported.
 
 # Step 5: Find a Failure
 print('--------Step 5: Find a Failure---------')
@@ -69,35 +76,48 @@ q = "What is Groundwork Coffee's revenue for 2025?"
 response = query_engine.query(q)
 print("Q:", q)
 print("A:", response)
-top_node = response.source_nodes[0]
-print(f"Document: {top_node.node.metadata['file_name']}")
-print(f"Similarity Score: {top_node.score:.4f}")
-print(f"Text Snippet: {top_node.node.get_content()[:200]}...")
-print("-" * 30)
+for i, node_with_score in enumerate(response.source_nodes[:3], start=1):
+    print(f"\nSource Node {i}:")
+    print(f"Document: {top_node.node.metadata['file_name']}")
+    print(f"Similarity Score: {top_node.score:.4f}")
+    print(f"Text Snippet: {top_node.node.get_content()[:200]}...")
+    print("-" * 30)
 
 # Comments:
-# I asked the model to provide the company's revenue for 2025 because this 
-# information was not expected to be in the provided documents, so I expected 
-# the assistant to struggle with the question.
-# The retrieval didnt find information about the company's revenue and 
-# model didnt guess an answer, instead, it corretly said that the information
-# wasn't available in the provided context.
-# The model also became more cautions and clearly said that it could not 
-# provide the answer. It's actually a good example of the system avoiding hallucination.
-# This proof that AI answers should still be checked
-# against the retrieved information instead of being trusted automatically.
-# To improve the system, I would add better handling for questions that are
-# outside the available documents and make the assistant clearly say when the information is not available.
+#
+# What I asked and why:
+# I asked for Groundwork Coffee's revenue for 2025 because I did not expect
+# this information to be in the provided documents. I expected the assistant
+# to struggle because the answer was not available in the context.
+#
+# What went wrong:
+# The retrieval returned chunks from the documents, but they did not contain
+# information about Groundwork Coffee's 2025 revenue. The model did not guess
+# a revenue number and instead said that the information was not available.
+# This means the main problem was missing information rather than the model
+# inventing an answer.
+#
+# Model tone:
+# The model became less confident and clearly stated that it could not provide
+# the answer from the available context. This is a good behavior because it
+# avoided hallucinating a number. It also shows that AI-generated answers
+# should still be checked against the retrieved sources instead of being
+# trusted automatically.
+#
+# How I would improve the system:
+# I would add a relevance threshold to detect when the retrieved chunks are
+# not relevant enough to answer the question. I would also instruct the model
+# to say that the information is not available when the documents do not
+# contain an answer.
 
 
 # Step 6: Reflection
-print('--------Step 6: Reflection--------')
 
 # Comments:
-# 1. The LlamaIndex implementation took much fewer lines of code compared to
-# doing the chunking, embedding, and indexing manually. This shows that a
-# framework like LlamaIndex can save time and make it easier to build a RAG
-# system without writing all of the underlying code ourselves.
+# 1. The manual implementation took about 100 lines, while the LlamaIndex
+# implementation took about 20 lines. This shows how a framework can greatly
+# reduce the amount of code needed and let us focus more on the application
+# instead of implementing the RAG pipeline ourselves.
 
 # 2. One useful use case would be an internal HR assistant. Employees could
 # ask questions about company policies, benefits, vacation rules, or other

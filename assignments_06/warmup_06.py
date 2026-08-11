@@ -8,43 +8,51 @@ if load_dotenv():
     print("API key loaded successfully.")
 else:
     print("Warning: could not load API key. Check your .env file.")
+    
 # --- RAG Concepts --- 
-
 # Concepts Q1
+#
 # Scenario A:
 # RAG is the best approach because the assistant needs to answer questions
 # using hundreds of internal PDFs that are updated regularly. RAG can retrieve
-# the relevant information from the current policy documents without retraining
-# the model every time the documents change.
+# current information from the policy documents without retraining the model
+# every time the documents change.
 #
 # Scenario B:
-# Fine-tuning is the best approach because the main goal is to consistently
+# Fine-tuning is the best approach because the goal is to consistently
 # generate product descriptions in a specific brand voice. The 3,000 examples
-# can help the model learn the company's writing style and patterns.
+# can help the model learn and reproduce the company's writing style.
 #
 # Scenario C:
 # Prompt engineering is the best approach because the user only needs answers
-# from one short report. The report can simply be included in the prompt, so
-# there is no need to build a RAG system or fine-tune the model.
+# from one short report. The report can be included directly in the prompt,
+# so there is no need to build a RAG system or fine-tune the model.
+
 
 
 # Concepts Q2
+#
 # A confidently wrong answer can be more harmful than saying "I'm not sure"
 # because people are more likely to trust and act on an answer that sounds
-# certain. For example, incorrect medical information could cause someone to
-# make an unsafe decision. A confident tone can make incorrect information
-# appear more reliable than it actually is.
+# certain.
+#
+# For example, if an AI gives incorrect medical information, a person might
+# follow the advice and make an unsafe decision.
+#
+# Tone affects trust because a confident and authoritative tone can make
+# incorrect information sound more reliable, even when the answer is wrong.
 
 # Concepts Q3
+#
 # steps = [
-#     "Generate a response from the LLM",
 #     "Extract text from source documents",
-#     "Receive the user's query",
-#     "Retrieve the most relevant chunks",
-#     "Convert text chunks into embeddings",
-#     "Inject retrieved chunks into the prompt",
 #     "Split text into chunks",
+#     "Convert text chunks into embeddings",
+#     "Receive the user's query",
 #     "Embed the user's query",
+#     "Retrieve the most relevant chunks",
+#     "Inject retrieved chunks into the prompt",
+#     "Generate a response from the LLM",
 # ]
 #
 # 1. Extract text from source documents
