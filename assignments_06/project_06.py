@@ -40,6 +40,7 @@ for i, doc in enumerate(docs, start=1):
     print(f"  {i}. {doc.metadata.get('file_name', 'Unknown')}")
 
 print("-" * 40)
+
 # Step 4: Query the Assistant
 
 print('----Step 4: Query the Assistant----')
@@ -58,6 +59,7 @@ for q in questions:
     print("A:", response)
 
     top_node = response.source_nodes[0]
+    print("Top Retrieved Source Node:")
     print(f"Document name: {top_node.node.metadata['file_name']}")
     print(f"Similarity Score: {top_node.score:.4f}")
     print(f"Text Snippet (first 200 characters): {top_node.node.get_content()[:200]}...")
@@ -86,6 +88,9 @@ q = "What is Groundwork Coffee's revenue for 2025?"
 response = query_engine.query(q)
 print("Q:", q)
 print("A:", response)
+
+print("All Retrieved Source Nodes:")
+
 for i, node_with_score in enumerate(response.source_nodes, start=1):
     print(f"\nSource Node {i}:")
     print(f"Document: {node_with_score.node.metadata['file_name']}")
