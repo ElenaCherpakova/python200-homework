@@ -22,7 +22,7 @@ else:
 # fine-tuning can help the model learn and consistently reproduce that style. The 3,000 examples provide enough training
 # data for the model to learn patterns that may be difficult to express through prompting alone.
 
-# Scenario C: For this case, prompt engineering is the great approach. Since analyst only needs to work with a single 2-page report
+# Scenario C: For this case, prompt engineering is the great approach. Because the user only needs a single short report
 # there is no need to fine-tune a model or build RAG system. We can simply include the report in the prompt and instruct the LLM
 # to answer questions based on its contents. 
 
@@ -36,14 +36,22 @@ else:
 
 # Concepts Q3
 # steps = [
-# 1. "Extract text from source documents",  - Read and extract the relevant text from documents or webpage
-# 2. "Split text into chunks" - Break the exctracted text into smaller pieces so they can be searchable
-# 3. "Convert text chunks into embeddings" - Convert each text chunk into a numerical vector that represents its meaning
-# 4. "Receive the user's query" - The system receives the question or request from the user
-# 5. "Embed the user's query" - Convert the user's question into a vector using the same embedding method
-# 6. "Retrieve the most relevant chunks" - Compare the query embedding with the document embeddings and find the most relevent chunks
-# 7. "Inject retrieved chunks into the prompt" - Add the retrieved information to the prompt so the LLM has relevant source material.
-# 8. "Generate a response from the LLM" -  The LLM uses the user's question and the retrieved context to generate an answer.
+# 1. "Extract text from source documents",  
+# - Read and extract the relevant text from documents or webpage
+# 2. "Split text into chunks" 
+# - Break the exctracted text into smaller pieces so they can be searchable
+# 3. "Convert text chunks into embeddings" 
+# - Convert each text chunk into a numerical vector that represents its meaning
+# 4. "Receive the user's query" 
+# - The system receives the question or request from the user
+# 5. "Embed the user's query" 
+# - Convert the user's question into a vector using the same embedding method
+# 6. "Retrieve the most relevant chunks" 
+# - Compare the query embedding with the document embeddings and find the most relevent chunks
+# 7. "Inject retrieved chunks into the prompt" 
+# - Add the retrieved information to the prompt so the LLM has relevant source material.
+# 8. "Generate a response from the LLM" 
+# -  The LLM uses the user's question and the retrieved context to generate an answer.
 # ]
 
 

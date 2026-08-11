@@ -21,7 +21,7 @@ print(f"Number of documents loaded: {len(docs)}\n")
 
 print(f"The file name of each document:")
 for doc in docs:
-    print(f"File name: doc.metadata['file_name']")
+    print(f"File name: {doc.metadata['file_name']}")
 
 
 # Step 3: Build the Index and Query Engine
