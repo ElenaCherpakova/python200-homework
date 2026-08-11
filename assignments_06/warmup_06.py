@@ -109,11 +109,10 @@ documents = {
 output = simple_keyword_retrieval(query, documents, verbose=True)
 print(output)
 
-# Comments: 
-# Loyalty.txt document was selected because it had the same overlap score (1) as hours and hiring documents
-# When multiple documents have the same score, scores.sort (reverse=True) uses
-# the document name to break the tie, so loyalty comes before hiring and hours alphabetically in reverse order. 
-# This shows a limitation of simple keyword retrieval because the selected document is not actually relevant to the user's question. 
+# Comments:
+# The selected document is hours.txt because it has the highest overlap score
+# of 1. hiring.txt and loyalty.txt also have a score of 1, but hours.txt is
+# selected because it is the first highest-scoring match after sorting.
 
 # Keyword Q2
 query_2 = "Do you have anything without caffeine?"
