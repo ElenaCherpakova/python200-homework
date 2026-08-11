@@ -25,11 +25,9 @@ else:
 # can help the model learn and reproduce the company's writing style.
 #
 # Scenario C:
-# Prompt engineering is the best approach because the user only needs answers
-# from one short report. The report can be included directly in the prompt,
-# so there is no need to build a RAG system or fine-tune the model.
-
-
+# RAG is the best approach because the assistant only needs to answer questions
+# about one specific two-page report. The report can be retrieved and provided
+# as context to the model without training the model on the document's content.
 
 # Concepts Q2
 #
@@ -37,14 +35,16 @@ else:
 # because people are more likely to trust and act on an answer that sounds
 # certain.
 #
-# For example, if an AI gives incorrect medical information, a person might
-# follow the advice and make an unsafe decision.
+# For example, if an AI assistant incorrectly tells someone that a certain
+# medication can safely be combined with another medication, the person might
+# follow that advice and experience a serious health problem.
 #
 # Tone affects trust because a confident and authoritative tone can make
-# incorrect information sound more reliable, even when the answer is wrong.
+# incorrect information sound reliable. This can cause users to trust and act
+# on a hallucinated answer instead of checking the information with a reliable
+# source or qualified professional.
 
 # Concepts Q3
-#
 # steps = [
 #     "Extract text from source documents",
 #     "Split text into chunks",
@@ -57,32 +57,28 @@ else:
 # ]
 #
 # 1. Extract text from source documents
-#    Read and extract the relevant text from the documents or webpages.
+# Read and extract the relevant text from the documents or webpages.
 #
 # 2. Split text into chunks
-#    Break the extracted text into smaller pieces so they can be searched.
+# Break the extracted text into smaller pieces so they can be searched efficiently.
 #
 # 3. Convert text chunks into embeddings
-#    Convert each text chunk into a numerical vector that represents its meaning.
+# Convert each text chunk into a numerical vector that represents its meaning.
 #
 # 4. Receive the user's query
-#    The system receives the user's question or request.
+# The system receives the user's question or request.
 #
 # 5. Embed the user's query
-#    Convert the user's question into a vector using the same embedding method.
+# Convert the user's question into a vector using the same embedding method.
 #
 # 6. Retrieve the most relevant chunks
-#    Compare the query embedding with the document embeddings and find the
-#    most relevant chunks.
+# Compare the query embedding with the document embeddings and find the most relevant chunks.
 #
 # 7. Inject retrieved chunks into the prompt
-#    Add the retrieved information to the prompt so the LLM has relevant
-#    source material.
+# Add the retrieved chunks to the prompt so the LLM has relevant source material.
 #
 # 8. Generate a response from the LLM
-#    The LLM uses the user's question and the retrieved context to generate
-#    an answer.
-
+# The LLM uses the user's question and retrieved context to generate an answer.
 
 # Keyword RAG
 import string
@@ -149,29 +145,36 @@ query_2 = "Do you have anything without caffeine?"
 output_2 = simple_keyword_retrieval(query_2, documents, verbose=True)
 print(output_2)
 
-# Comments: 
-# None of the documents were selected because there were no overlapping keywords between
-# the query and any of the documents.
-# Keyword RAG didn't get this right because menu document contain relevant information about drinks, but 
-# it does not contain the exact keyword 'caffeine'. Keyword retrieval only looks for matching words and does not
-# understand that the question is related to the drinks in menu.
-# I think semantic retrival using embeddings would be better because it can compare the meaning of the query with the 
-# meaning of the document, even when the exact keywords do not match. 
+# Comments:
+# No relevant document was selected because none of the filtered query words
+# overlapped with the document text. The function therefore returned
+# "None found" instead of selecting menu.txt.
+#
+# This shows a limitation of keyword retrieval. The menu document contains
+# drinks that could be relevant to a question about caffeine, but it does not
+# contain the exact word "caffeine". Keyword retrieval only matches words and
+# does not understand that some drinks may be caffeine-free or related to the
+# concept of caffeine.
+#
+# Semantic retrieval would work better because embeddings compare the meaning
+# of the query with the meaning of the document, even when the exact keywords
+# are different.
 
 # Keyword Q3
-
-# I predict that no relevant document will be selected because none of the words in the query appear in the documents.
-# The word like "for" is a stopword so it will be removed from the query before the keyword matching happens.
-
 query_3 = "How do I sign up for rewards?"
 output_3 = simple_keyword_retrieval(query_3, documents, verbose=True)
 print(output_3)
 
 # Comments:
-# My prediction was correct. No relevant content was found because there were no overlapping keywords
-# between the query and any of the document. Although loyalty document is clearly related to rewards, the document uses 
-# different words such loyalty program and points which keyword retrieval doesnt no recognized as having the same meaning.
-
+# I expected this query to be difficult for keyword retrieval because the
+# loyalty document discusses a "loyalty program" and "points", while the query
+# uses the word "rewards". Keyword retrieval does not understand that these
+# terms can have similar meanings.
+#
+# The result shows the limitation of exact keyword matching. Even though the
+# loyalty document is clearly related to the user's question, keyword retrieval
+# may fail to select it when the important words in the query and document are
+# different.
 
 # Semantic RAG Concepts
 
@@ -197,11 +200,11 @@ print(output_3)
 # | Relevance score  | Keyword overlap count    | Similarity score          |
 
 # LlamaIndex
+
+# Q1
 docs = SimpleDirectoryReader("../../../python-200-v1/lessons/06_AI_augmentation/resources/brightleaf_pdfs").load_data()
 index = VectorStoreIndex.from_documents(docs)
 print(type(index._vector_store).__name__)
-
-# Q1
 query_engine = index.as_query_engine(similarity_top_k=3)
 
 questions = [
@@ -228,26 +231,26 @@ for q in questions:
 # Comments:
 #
 # Employee benefits:
-# The first retrieved chunk is highly relevant because it specifically
-# describes the company benefits program and has a high similarity score of
-# 0.9086. The other retrieved chunks are less relevant because they discuss
-# the company's overview and security.
+# The query retrieves exactly three source nodes. The first source has the
+# highest similarity score and is the most relevant because it specifically
+# discusses BrightLeaf's employee benefits. The other two sources are less
+# relevant because they contain general company or security information.
 #
-# The model's response sounds confident and specific. It lists several
-# benefits without showing uncertainty. An unexpected result is that the
-# security and general overview chunks were also retrieved, even though they
-# are not directly related to employee benefits.
+# The response sounds confident and specific. It provides several benefits
+# without expressing uncertainty. The retrieval of unrelated security and
+# company overview chunks shows that semantic retrieval can include partially
+# related information.
 #
 # Security policies:
-# The first retrieved chunk is highly relevant because it specifically
-# discusses Network and Data Security and has a similarity score of 0.8838.
-# The benefits and general overview chunks are less relevant to this question.
+# The query also retrieves exactly three source nodes. The first source has
+# the highest similarity score and is highly relevant because it discusses
+# BrightLeaf's Network and Data Security policies. The other retrieved chunks
+# are less directly related.
 #
-# The model's response also sounds confident and specific. It provides
-# detailed security information without showing much uncertainty. An
-# unexpected result is that the employee benefits chunk was also retrieved.
-# This shows that semantic retrieval can return chunks that are somewhat
-# related to the question, but not always perfectly relevant.
+# The response sounds confident and specific and provides detailed security
+# information. An unexpected result is that an employee benefits chunk is
+# also retrieved, showing that the top three results are not necessarily all
+# directly relevant.
 
 # Q2
 q = "What employee benefits does BrightLeaf offer?"
@@ -361,23 +364,30 @@ print("Relevancy Result 2: " + str(relevancy_result_2.score))
 
 # Comments:
 #
-# A faithfulness score of 1.0 means the answer is fully supported by the
-# retrieved information. A score of 0.0 means the answer is not supported
-# by the retrieved context.
+# Faithfulness measures whether the answer is supported by the retrieved
+# context. A high faithfulness score means the response is grounded in the
+# retrieved information, while a low score means the response contains
+# information that is not supported by the context.
 #
-# A relevancy score measures how well the answer addresses the user's question.
-# Faithfulness checks whether the answer is supported by the context, while
-# relevancy checks whether the answer is relevant to the question.
+# Relevancy measures whether the response is related to the user's question.
+# Therefore, faithfulness and relevancy measure different things: an answer
+# can be relevant to a question but still contain information that is not
+# supported by the retrieved documents.
 #
-# The scores changed between the two queries. The first query had 1.0 for both
-# faithfulness and relevancy. The second query had 0.0 for faithfulness and
-# 1.0 for relevancy. This happened because the documents contained information
-# about employee benefits but did not contain information about BrightLeaf's
-# current stock price. The response was relevant to the question, but it was
-# not supported by the retrieved context.
+# For the employee benefits question, both scores were 1.0. This indicates
+# that the answer was relevant to the question and supported by the retrieved
+# BrightLeaf documents.
 #
-# LLM-as-a-judge means using another LLM to evaluate the generated answer.
+# For the stock price question, faithfulness decreased to 0.0 because the
+# documents did not contain BrightLeaf's current stock price. The response
+# was still evaluated as relevant because it addressed the stock-price
+# question, but the information was not supported by the retrieved context.
+#
+# This demonstrates why both evaluators are useful. Relevancy alone does not
+# prove that an answer is factually supported by the retrieved documents.
+#
+# LLM-as-a-judge means using another LLM to evaluate a generated answer.
 # It is useful for RAG because there can be multiple valid ways to answer a
-# question, so a simple exact-match accuracy metric would not work well.
-# The LLM judge can evaluate whether the answer is relevant and supported
-# by the retrieved context.
+# question, making simple exact-match accuracy insufficient. The evaluator
+# can judge whether the response is relevant and grounded in the retrieved
+# context.
