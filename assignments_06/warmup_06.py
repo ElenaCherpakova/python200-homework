@@ -64,7 +64,7 @@ def simple_keyword_retrieval(query, documents, verbose=True):
     stopwords = {
         "a", "an", "the", "and", "or", "in", "on", "of", "for", "to", "is",
         "are", "was", "were", "by", "with", "at", "from", "that", "this",
-        "as", "be", "it", "its", "their", "they", "we", "you", "our"
+        "as", "be", "it", "its", "their", "they", "we", "you", "our", "your"
     }
     translator = str.maketrans("", "", string.punctuation)
 
@@ -113,8 +113,7 @@ print("Selected document:", output[0][0])
 
 # Comments:
 # The selected document is hours.txt because it has the highest overlap score
-# of 1. hiring.txt and loyalty.txt also have a score of 1, but hours.txt is
-# selected because it is the first highest-scoring match after sorting.
+# of 1. hiring.txt and contains word 'weekends'.
 
 # Keyword Q2
 query_2 = "Do you have anything without caffeine?"

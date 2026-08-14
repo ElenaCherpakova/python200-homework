@@ -143,3 +143,108 @@ for i, node_with_score in enumerate(response.source_nodes, start=1):
 # contain incorrect or outdated information. Even if the retrieval works
 # correctly, the model can still generate an answer based on that incorrect
 # information.
+
+
+
+# Optional Extenstions
+# Extension A: Side-by-Side Comparison (Moderate)
+print('-----------------# Optional Extenstions-------------')
+print('----------------- Extension A: Side-by-Side Comparison (Moderate)-------------')
+import string
+
+url_path = '../../../python-200-v1/lessons/06_AI_augmentation/resources/groundwork_docs'
+docs_dir = Path(url_path)
+documents = {f.name: f.read_text() for f in docs_dir.glob("*.txt")}
+
+
+questions = [
+    "What are Groundwork's hours on weekends?",
+    "Do you offer any dairy-free milk options?",
+    "How does the loyalty program work?",
+    "How did Groundwork Coffee get started?",
+    "Do you offer catering or wholesale orders?",
+]
+
+
+def simple_keyword_retrieval(query, documents, verbose=True):
+    """Keyword retrieval using token overlap scoring."""
+    stopwords = {
+        "a", "an", "the", "and", "or", "in", "on", "of", "for", "to", "is",
+        "are", "was", "were", "by", "with", "at", "from", "that", "this",
+        "as", "be", "it", "its", "their", "they", "we", "you", "our"
+    }
+    translator = str.maketrans("", "", string.punctuation)
+
+    query_words = {
+        w.translate(translator)
+        for w in query.lower().split()
+        if w not in stopwords
+    }
+    if verbose:
+        print(f"\nQuery tokens (filtered): {sorted(query_words)}")
+
+    scores = []
+    for name, content in documents.items():
+        content_words = {
+            w.translate(translator)
+            for w in content.lower().split()
+            if w not in stopwords
+        }
+        overlap = query_words & content_words
+        score = len(overlap)
+        scores.append((score, name, content))
+        if verbose:
+            print(f"[{name}] overlap={score} -> {sorted(overlap)}")
+
+    scores.sort(reverse=True)
+    best = next(((name, content) for score, name, content in scores if score > 0), None)
+    if best:
+        if verbose:
+            print(f"\nSelected best match: {best[0]}")
+        return [best]
+    else:
+        if verbose:
+            print("\nNo overlapping keywords found.")
+        return [("None found", "No relevant content.")]
+
+    
+    
+print('----------------- LlamaIndex ------------------')
+
+docs = SimpleDirectoryReader(url_path).load_data()
+index = VectorStoreIndex.from_documents(docs)
+query_engine = index.as_query_engine(similarity_top_k=5)
+
+
+print('------------- Side-by-Side --------------')
+
+for q in questions:
+    keyword_result = simple_keyword_retrieval(
+        q,
+        documents,
+        verbose=True
+    )
+
+    print("\nKEYWORD RAG")
+    print("Retrieved document:", keyword_result[0][0])
+    print("Retrieved content:", keyword_result[0][1][:500]) 
+
+    response = query_engine.query(q)
+    print('\nSemantic RAG/LlamaIndex')
+    print("A:", response)
+
+    for i, node_with_score in enumerate(response.source_nodes, start=1):
+        print(f"Source {i}:")
+        print(f"Document: {node_with_score.node.metadata['file_name']}")
+        print(f"Similarity Score: {node_with_score.score:.4f}")
+        print(
+            f"Text Snippet: "
+            f"{node_with_score.node.get_content()[:150]}..."
+            )
+        print("-" * 30)
+    
+# Comments:
+# Keyword RAG relies on exact words overlap, whereas Semantic RAG can retrieve
+# documents based on meaning. Keyword RAG will succeed and perfom better 
+# when query contains words that appear directly in the relevant document, 
+# but it can fail when the query uses different wording.
