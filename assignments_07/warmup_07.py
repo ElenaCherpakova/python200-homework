@@ -151,7 +151,7 @@ print("Response B:", response_b)
 # The celsius_to_fahrenheit tool is not needed, so the model answers directly.
 
 # --- Lesson 03 ---
-# Q1
+# Q4
 
 RESOURCES_DIR = Path('resources')
 RESOURCES_DIR
@@ -381,7 +381,7 @@ node_tools = {
     "summarize_columns": csv_backend.summarize_columns,
     "describe_column": csv_backend.describe_column,
     "plot_data": csv_backend.plot_data,
-    "compute_correlation": csv_backend.compute_correlation 
+    "compute_correlation": csv_backend.compute_correlation # Q4: new tool
 }
 
 tools_schema = [
@@ -743,6 +743,7 @@ def compute_correlation(col1: str, col2: str) -> str:
     """
     
     return csv_manager.compute_correlation(col1, col2)
+print(compute_correlation.description)  # Q7: required line
 
 TOOLS = [
     list_csv_files,
