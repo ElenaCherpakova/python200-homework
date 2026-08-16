@@ -726,7 +726,7 @@ def plot_data(y: str, x: str | None = None, plot_type: str = "line") -> str | di
 
     Returns:
         Generates and shows the plot. 
-        Retirms a short success message string, or an error dict/string.
+        Returns a short success message string, or an error dict/string.
     """
     return csv_manager.plot_data(y=y, x=x, plot_type=plot_type)
 
@@ -735,14 +735,13 @@ def compute_correlation(col1: str, col2: str) -> str:
     """Compute the Pearson correlation between two columns in the loaded DataFrame.
     
     Args:
-    col1: Name of the first column
-    col2: Name of the second column
+        col1: Name of the first column
+        col2: Name of the second column
     
     Returns:
-    The correlation coefficient and p-value
+        The correlation coefficient and p-value
     """
     
-    print(compute_correlation.description)
     return csv_manager.compute_correlation(col1, col2)
 
 TOOLS = [
@@ -812,18 +811,21 @@ response_tool = tool_agent.run(prompt)
 response_code = code_agent.run(prompt, additional_args={"csv_manager": csv_manager})
 
 # Comments:
-# The ToolCallingAgent was unable to change the dot color, while the CodeAgent
-# successfully changed it by generating and executing Python code.
+# For the prompt "Load bike_commute.csv. Plot avg_heart_rate vs duration_min as a
+# scatter plot with green dots.":
 #
-# This shows that a ToolCallingAgent is most useful when the task can be completed
-# using predefined tools with specific functions. A CodeAgent is more flexible for
-# tasks that require calculations, data manipulation, or custom code that is not
-# directly supported by the available tools.
+# - response_tool (ToolCallingAgent): called plot_data(y='avg_heart_rate',
+#   x='duration_min', plot_type='scatter'), but plot_data has no way to set marker
+#   color, so the scatter plot was produced with the default color — the "green dots"
+#   part of the request was ignored/not honored.
 #
-# The CodeAgent was given the model, tools, system prompt, and a list of authorized
-# imports. The authorized imports (matplotlib, pandas, and numpy) define which
-# libraries the generated code can use. Specifying them helps constrain the agent's
-# capabilities and can make its behavior more predictable and safer.
+# - response_code (CodeAgent): recognized that styling wasn't supported by plot_data,
+#   and instead wrote its own matplotlib code (plt.scatter(..., color='green')) to
+#   fulfill the exact request, producing a scatter plot with green dots as asked.
+#
+# This shows the practical difference: ToolCallingAgent is limited to whatever the
+# tool's parameters expose, while CodeAgent can go beyond the tool's interface when
+# the task calls for something the tools don't directly support.
 
 # Q9
 # 1. A ToolCallingAgent would be a better choice for a task such as loading CSV, 

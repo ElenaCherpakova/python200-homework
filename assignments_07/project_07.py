@@ -20,10 +20,11 @@ api_key = os.getenv('OPEN_API_KEY')
 print('OpenAI client created.')
 
 # Pre-task: Load the Data
-DATA_PATH = "../assignments_01/outputs/merged_happiness.csv"
-
+# DATA_PATH = "../assignments_01/outputs/merged_happiness.csv"
+DATA_PATH = "assignments_01/outputs/merged_happiness.csv"
 # Task 1: Define Your Tools
-data_dir = "../assignments_01/happiness_project"
+# data_dir = "../assignments_01/happiness_project"
+data_dir = "assignments/resources/happiness_project"
 file_name = "world_happiness"
 # print(os.getcwd())  # confirm what directory you're actually running from
 # print(os.path.exists(DATA_PATH))  # True/False for the merged file
@@ -172,21 +173,6 @@ def get_top_n_countries(column: str, year: int, n: int = 5) -> dict:
         return {"error": "n must be a positive integer."}
     filtered_df = df[df['year'] == year].sort_values(by=column, ascending=False).head(n)
     return filtered_df[['country', column]].to_dict(orient='records')
-    
-@tool
-def get_all_data() -> list:
-    """Return the entire loaded dataset as a list of row dictionaries.
-
-    Use this when the agent needs the full dataset for custom analysis,
-    grouping, filtering, or plotting.
-
-    Returns:
-        A list of row dictionaries, or an error dictionary if no data
-        has been loaded.
-    """
-    if df is None:
-        return {"error": "No data loaded. Call load_happiness_data first."}
-    return df.to_dict(orient='records')
 
 # Task 2: Build the Agent
 model = OpenAIServerModel(api_key=api_key, model_id="gpt-4o-mini")
@@ -197,25 +183,19 @@ You are a data analyst assistant for the World Happiness dataset.
 Use the available tools for loading data, summarizing columns, computing correlations,
 and ranking countries.
 
-A variable named `df` is not available in your code — never reference it directly.
+For custom analysis or plots the tools don't cover (e.g. grouping by year and region),
+a variable named `df` containing the full dataset will be available directly in your
+code execution environment — use it as a regular pandas DataFrame.
 
-The `load_happiness_data()` tool loads the shared dataset and returns a dictionary
-containing "shape" and "columns". It does not return a DataFrame. To get the shape
-and column names, use the values from the returned dictionary.
-
-For custom analysis or plots, call `get_all_data()` to get the full dataset as a list
-of dictionaries, then build a DataFrame with `pd.DataFrame(get_all_data())`.
-
-Use `pd.concat()` to combine DataFrames, not `.append()` (removed in modern pandas).
+Use pd.concat() to combine DataFrames, not .append() (removed in modern pandas).
 
 Write code directly only when the tools aren't sufficient.
-
-After using a tool, provide a clear final answer to the user's question.
 Be concise and student-friendly in your responses.
 """
 
+
 agent = CodeAgent(
-    tools=[load_happiness_data, summarize_column, compute_correlation, get_top_n_countries, get_all_data],
+    tools=[load_happiness_data, summarize_column, compute_correlation, get_top_n_countries],
     model=model,
     instructions=SYSTEM_PROMPT,
     additional_authorized_imports=["pandas", "matplotlib.pyplot", "scipy.stats"],
