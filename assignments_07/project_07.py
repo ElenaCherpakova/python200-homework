@@ -218,7 +218,7 @@ if __name__ == "__main__":
 
     for query in queries:
         print(f"\n--- Query: {query} ---")
-        response = agent.run(query, reset=False)
+        response = agent.run(query, reset=False, additional_args={"df": df})
         print(response)
 
     # My query 1
@@ -236,8 +236,8 @@ if __name__ == "__main__":
     print(response_2)
     # Comment: Did this trigger tool use, code generation, or both?
     # Triggered both tool use and code generation. The agent called get_top_n_countries()
-    # and get_all_data() to retrieve country/score data, then wrote its own matplotlib code
-    # (plt.bar, color-coding top vs. bottom, saving the figure) since no tool covers bar chart
+    # to retrieve country/score data, then wrote its own matplotlib code (plt.bar,
+    # color-coding top vs. bottom, saving the figure) since no tool covers bar chart
     # generation. This query required several iterations to get right — the agent initially tried
     # calling get_top_n_countries() twice with identical arguments to get both "top" and "bottom"
     # results, then self-corrected by fetching all countries and sorting locally. It also hit and
@@ -255,8 +255,9 @@ if __name__ == "__main__":
 # you expected, or less? Describe one specific example.
 # Less capable: when asked to plot happiness_score by region, the agent kept trying to
 # access a variable called df directly, even though that variable doesn't exist in its
-# code execution environment. It took several failed attempts (and even a hallucinated
-# import) before I fixed this by adding a dedicated tool to hand it the data instead.
+# code execution environment by default. It took several failed attempts (and even a
+# hallucinated import) before I fixed this by passing df into the agent's execution
+# context directly via additional_args={"df": df} on each agent.run() call.
 # More capable: when a plot failed due to a macOS-specific threading error, the agent
 # diagnosed the issue on its own and added matplotlib.use('Agg') without being told.
 
