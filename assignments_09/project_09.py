@@ -58,7 +58,7 @@ print("\n---------Step 3: Load---------\n")
 import os 
 from dotenv import load_dotenv
 from supabase import create_client
-
+from datetime import date
 load_dotenv()
 
 supabase = create_client(
@@ -84,12 +84,26 @@ print(f"Rows in weather_raw: {count_response.count}")
 # Spot-check: first and last record
 first = supabase.table("weather_raw").select("*").eq("date", "2023-01-01").execute()
 last  = supabase.table("weather_raw").select("*").eq("date", "2023-12-31").execute()
-july = supabase.table("weather_raw").select("*").eq("date", "2023-07-04").execute()
+# july = supabase.table("weather_raw").select("*").eq("date", "2023-07-04").execute()
+
+# nearest 
+target_date = date(2023, 7, 4)
+response = supabase.table("weather_raw").select("*").execute()
+rows = response.data
+nearest = min(
+    rows, 
+    key=lambda row: (
+        abs(date.fromisoformat(row['date']) - target_date), 
+        date.fromisoformat(row['date'])
+        )
+    );
+
 print("Earliest record:", first.data)
 print("Latest record: ", last.data)
-print("July 4th record:", july.data)
+# print("July 4th record:", july.data)
+print("Nearest record to July 4th:", nearest)
 
 # Rows in weather_raw: 365
 # Earliest record: [{'date': '2023-01-01', 'temperature_2m_max': 3.5, 'temperature_2m_min': 1.9, 'precipitation_sum': 1.8, 'wind_speed_10m_max': 18.1, 'loaded_at': '2026-09-01T01:21:28.765864+00:00'}]
 # Latest record:  [{'date': '2023-12-31', 'temperature_2m_max': 1.7, 'temperature_2m_min': -0.6, 'precipitation_sum': 2.0, 'wind_speed_10m_max': 13.6, 'loaded_at': '2026-09-01T01:21:28.765864+00:00'}]
-# July 4th record: [{'date': '2023-07-04', 'temperature_2m_max': 28.7, 'temperature_2m_min': 17.9, 'precipitation_sum': 0.1, 'wind_speed_10m_max': 16.2, 'loaded_at': '2026-09-01T01:21:28.765864+00:00'}]
+# Nearest record to July 4th: [{'date': '2023-07-04', 'temperature_2m_max': 28.7, 'temperature_2m_min': 17.9, 'precipitation_sum': 0.1, 'wind_speed_10m_max': 16.2, 'loaded_at': '2026-09-01T01:21:28.765864+00:00'}]
