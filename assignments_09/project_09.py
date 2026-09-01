@@ -1,3 +1,4 @@
+# Link to the video: https://drive.google.com/file/d/1dgoWPioB9CtTViRhA6kYpse4PBudLxQU/view?usp=drive_link
 
 import requests
 
@@ -81,16 +82,14 @@ print("\n---------Step 4: Verify---------\n")
 count_response = supabase.table("weather_raw").select("date", count="exact").execute()
 print(f"Rows in weather_raw: {count_response.count}")
 # Spot-check: first and last record
-earliest = supabase.table("weather_raw").select("*").order("date", desc=False).limit(1).execute()
-latest  = supabase.table("weather_raw").select("*").order("date", desc=True).limit(1).execute()
+first = supabase.table("weather_raw").select("*").eq("date", "2023-01-01").execute()
+last  = supabase.table("weather_raw").select("*").eq("date", "2023-12-31").execute()
 july = supabase.table("weather_raw").select("*").eq("date", "2023-07-04").execute()
-print("Earliest record:", earliest.data)
-print("Latest record: ", latest.data)
+print("Earliest record:", first.data)
+print("Latest record: ", last.data)
 print("July 4th record:", july.data)
 
-# Rows in weather_raw: 366
+# Rows in weather_raw: 365
 # Earliest record: [{'date': '2023-01-01', 'temperature_2m_max': 3.5, 'temperature_2m_min': 1.9, 'precipitation_sum': 1.8, 'wind_speed_10m_max': 18.1, 'loaded_at': '2026-09-01T01:21:28.765864+00:00'}]
-# Latest record:  [{'date': '2026-08-24', 'temperature_2m_max': 22.0, 'temperature_2m_min': 16.0, 'precipitation_sum': 0.0, 'wind_speed_10m_max': 44.0, 'loaded_at': '2026-09-01T01:20:05.205881+00:00'}]
+# Latest record:  [{'date': '2023-12-31', 'temperature_2m_max': 1.7, 'temperature_2m_min': -0.6, 'precipitation_sum': 2.0, 'wind_speed_10m_max': 13.6, 'loaded_at': '2026-09-01T01:21:28.765864+00:00'}]
 # July 4th record: [{'date': '2023-07-04', 'temperature_2m_max': 28.7, 'temperature_2m_min': 17.9, 'precipitation_sum': 0.1, 'wind_speed_10m_max': 16.2, 'loaded_at': '2026-09-01T01:21:28.765864+00:00'}]
-
-# Link to the video: https://drive.google.com/file/d/1dgoWPioB9CtTViRhA6kYpse4PBudLxQU/view?usp=drive_link
