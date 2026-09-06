@@ -165,8 +165,6 @@ print(f"Upserted {len(response.data)} rows into weather_enriched")
 
 # Step 5: Verify
 
-# Step 5: Verify
-
 # Get total number of rows
 response = supabase.table("weather_enriched").select("*").execute()
 all_rows = response.data
@@ -181,11 +179,11 @@ print(f"Good days: {good_days}")
 print("\nSample rows:")
 for row in all_rows[:5]:
     print(
-        f"\n{row["date"]} | "
-        f"good={row["good_for_running"]} | "
-        f"conf={row["confidence"]:.2f}"
+        f"\n{row['date']} | "
+        f"good={row['good_for_running']} | "
+        f"conf={row['confidence']:.2f}"
     )
-    print(f"  {row["llm_summary"]}")
+    print(f"  {row['llm_summary']}")
     
     
 # I looked at several of the LLM summaries. Most of the summaries that were generated accurately
