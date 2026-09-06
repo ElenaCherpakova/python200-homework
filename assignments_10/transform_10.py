@@ -24,6 +24,10 @@ already_done = {row["date"] for row in enriched_response.data}
 
 to_classify = [row for row in raw_rows if row["date"] not in already_done]
 
+if not to_classify:
+    print("Nothing to do — all records already enriched.")
+    exit()
+    
 print(f"Raw records: {len(raw_rows)}") # 366
 print(f"Already enriched: {len(already_done)}") # 0
 print(f"Will be processed: {len(to_classify)}") # 366
@@ -48,7 +52,8 @@ for i, row in enumerate(to_classify):
     enrichment_records.append({
         "date":  row["date"],
         "good_for_running": bool(predictions[i]),
-        "confidence": round(float(probabilities[i]), 4)
+        "confidence": round(float(probabilities[i]), 4),
+         "llm_summary":      None,
     })
 
 print("Sample enrichment records:")
@@ -183,7 +188,6 @@ for row in all_rows[:5]:
         f"conf={row['confidence']:.2f}"
     )
     print(f"  {row['llm_summary']}")
-    
     
 # I looked at several of the LLM summaries, and most of them matched the weather features 
 # and the model's prediction. A good example was May 24 because the recommendation mentioned 
