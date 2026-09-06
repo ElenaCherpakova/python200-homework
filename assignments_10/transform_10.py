@@ -118,14 +118,13 @@ def validate_summary(text):
         return None
     # Reject if more than two sentences 
     sentences = [s for s in text.split('.') if s.strip()]
-    if len(sentences) != 1:
+    if len(sentences) > 2:
         return None
     return text
 
 for i, record in enumerate(enrichment_records):
+    raw_row = next(r for r in to_classify if r["date"] == record["date"])
     try:
-        raw_row = next(r for r in to_classify if r["date"] == record["date"])
-    
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -186,12 +185,14 @@ for row in all_rows[:5]:
     print(f"  {row['llm_summary']}")
     
     
-# I looked at several of the LLM summaries. Most of the summaries that were generated accurately
-# reflected the weather and the model's prediction. A good example was the May 25 summary 
-# because it mentioned the mild temperature and wind and agreed with the model's `good=True` 
-# prediction. A weaker example was May 18 because the recommendation was unavailable even 
-# though the model predicted that it was a good day for running. 
-# This could have been caused by an API error or the LLM response not passing the validation check.
+# I looked at several of the LLM summaries, and most of them matched the weather features 
+# and the model's prediction. A good example was May 24 because the recommendation mentioned 
+# the mild temperature and wind and agreed with the `good=False` prediction. 
+# A weaker example was May 25 because the recommendation was unavailable even though the model 
+# predicted `good=True`. This could have been caused by an API error or the response 
+# not passing the validation check. Overall, the available summaries were consistent 
+# with the weather and the model's predictions.
+
 
 
 # Step 6: Reflect
