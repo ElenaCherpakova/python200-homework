@@ -35,9 +35,8 @@ df = None
 def load_happiness_data() -> dict:
     """Load the World Happiness dataset.
 
-    Loads the merged CSV from DATA_PATH if it exists.
-    If the merged file does not exist, loads and merges the yearly
-    CSV files from the happiness_project resources directory.
+    Loads the merged CSV if it exists. Otherwise, loads and merges
+    the yearly CSV files from the happiness_project resources folder.
 
     Returns:
         A dict containing the dataset shape and column names,
@@ -46,21 +45,23 @@ def load_happiness_data() -> dict:
     global df
 
     try:
+        # First try the merged dataset
         if os.path.exists(DATA_PATH):
             df = pd.read_csv(DATA_PATH)
 
+        # Otherwise fall back to yearly files
         else:
             yearly_files = sorted(
                 [
-                    f for f in os.listdir(data_dir)
-                    if f.lower().endswith(".csv")
+                    filename
+                    for filename in os.listdir(data_dir)
+                    if filename.startswith("world_happiness_")
+                    and filename.endswith(".csv")
                 ]
             )
 
             if not yearly_files:
-                return {
-                    "error": f"No CSV files found in {data_dir}."
-                }
+                return {"error": f"No yearly CSV files found in {data_dir}."}
 
             frames = []
 
@@ -74,17 +75,7 @@ def load_happiness_data() -> dict:
                     encoding="utf-8"
                 )
 
-                # Extract the year from the filename, e.g.
-                # world_happiness_2015.csv -> 2015
-                try:
-                    year = int(
-                        os.path.splitext(filename)[0].split("_")[-1]
-                    )
-                except ValueError:
-                    return {
-                        "error": f"Could not determine year from {filename}."
-                    }
-
+                year = int(filename.replace("world_happiness_", "").replace(".csv", ""))
                 year_df["year"] = year
                 frames.append(year_df)
 
@@ -191,7 +182,6 @@ def get_top_n_countries(column: str, year: int, n: int = 5) -> dict:
     return filtered_df[['country', column]].to_dict(orient='records')
 
 # Task 2: Build the Agent
-model = OpenAIServerModel(api_key=api_key, model_id="gpt-4o-mini")
 
 SYSTEM_PROMPT = """
 You are a data analyst assistant for the World Happiness dataset.
@@ -209,8 +199,14 @@ Write code directly only when the tools aren't sufficient.
 Be concise and student-friendly in your responses.
 """
 
+# Running the Project
 
-agent = CodeAgent(
+def main():
+    os.makedirs("outputs", exist_ok=True)
+    
+    model = OpenAIServerModel(api_key=api_key, model_id="gpt-4o-mini")
+    
+    agent = CodeAgent(
     tools=[load_happiness_data, summarize_column, compute_correlation, get_top_n_countries],
     model=model,
     instructions=SYSTEM_PROMPT,
@@ -218,12 +214,7 @@ agent = CodeAgent(
     max_steps=8,
 )
 
-# Running the Project
-
-if __name__ == "__main__":
-    os.makedirs("outputs", exist_ok=True)
-    
-    
+    # Task 3: Guided queries
     queries = [
         "Load the happiness data and tell me its shape and column names.",
         "Summarize the happiness_score column.",
@@ -259,6 +250,8 @@ if __name__ == "__main__":
     # This triggered both tool use and code generation. The agent used
     # get_top_n_countries to retrieve data and generated Python/matplotlib
     # code to create the requested bar chart.
+if __name__ == "__main__":
+    main()
 
 # --- Reflection ---
 #
