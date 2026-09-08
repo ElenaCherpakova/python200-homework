@@ -10,7 +10,6 @@ from scipy.stats import pearsonr
 from smolagents import ToolCallingAgent, OpenAIServerModel, tool
 from smolagents import CodeAgent
 
-
 if load_dotenv():
     print("API key loaded successfully.")
 else:
