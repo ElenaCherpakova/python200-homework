@@ -203,16 +203,28 @@ Be concise and student-friendly in your responses.
 
 def main():
     os.makedirs("outputs", exist_ok=True)
-    
-    model = OpenAIServerModel(api_key=api_key, model_id="gpt-4o-mini")
-    
+
+    model = OpenAIServerModel(
+        api_key=api_key,
+        model_id="gpt-4o-mini"
+    )
+
     agent = CodeAgent(
-    tools=[load_happiness_data, summarize_column, compute_correlation, get_top_n_countries],
-    model=model,
-    instructions=SYSTEM_PROMPT,
-    additional_authorized_imports=["pandas", "matplotlib.pyplot", "scipy.stats"],
-    max_steps=8,
-)
+        tools=[
+            load_happiness_data,
+            summarize_column,
+            compute_correlation,
+            get_top_n_countries
+        ],
+        model=model,
+        instructions=SYSTEM_PROMPT,
+        additional_authorized_imports=[
+            "pandas",
+            "matplotlib.pyplot",
+            "scipy.stats"
+        ],
+        max_steps=8,
+    )
 
     # Task 3: Guided queries
     queries = [
@@ -228,31 +240,34 @@ def main():
         response = agent.run(query, reset=False)
         print(response)
 
-    # Task 4 - Custom Query 1
-
+    # Task 4: Custom Query 1
     my_query_1 = "What's the correlation between social_support and happiness_score?"
     response_1 = agent.run(my_query_1, reset=False)
+    print(f"\n--- Custom Query 1 ---")
     print(response_1)
 
-    # This triggered tool use only. The agent used compute_correlation because
-    # the requested calculation was already available as a predefined tool.
-    
-    # Task 4 - Custom Query 2
+    # Observation: This triggered tool use only. The agent used
+    # compute_correlation because the requested calculation was already
+    # available as a predefined tool.
 
+    # Task 4: Custom Query 2
     my_query_2 = (
         "Create a bar chart comparing the top 5 and bottom 5 countries "
         "by happiness_score in 2022."
-)
+    )
 
     response_2 = agent.run(my_query_2, reset=False)
+    print(f"\n--- Custom Query 2 ---")
     print(response_2)
 
-    # This triggered both tool use and code generation. The agent used
-    # get_top_n_countries to retrieve data and generated Python/matplotlib
-    # code to create the requested bar chart.
+    # Observation: This triggered both tool use and code generation.
+    # The agent used get_top_n_countries to retrieve the data and then
+    # generated matplotlib code to create the requested bar chart.
+
+
 if __name__ == "__main__":
     main()
-
+    
 # --- Reflection ---
 #
 # 1. In Query 3, how did the agent communicate whether the correlation was statistically
