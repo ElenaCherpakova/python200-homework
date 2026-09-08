@@ -33,45 +33,62 @@ df = None
 
 @tool
 def load_happiness_data() -> dict:
-    """Load the World Happiness dataset into the shared global DataFrame.
+    """Load the World Happiness dataset.
 
-    Loads the merged CSV from DATA_PATH. If it does not exist, falls back
-    to loading and merging the yearly CSV files.
+    Loads the merged CSV from DATA_PATH if it exists.
+    If the merged file does not exist, loads and merges the yearly
+    CSV files from the happiness_project resources directory.
 
     Returns:
-        A dict containing "shape" and "columns", or an "error" key.
+        A dict containing the dataset shape and column names,
+        or an error message.
     """
     global df
 
     try:
         if os.path.exists(DATA_PATH):
             df = pd.read_csv(DATA_PATH)
-        else:
-            res = []
 
-            for year in years:
-                file_path = os.path.join(
-                    data_dir,
-                    f"{file_name}_{year}.csv"
+        else:
+            yearly_files = sorted(
+                [
+                    f for f in os.listdir(data_dir)
+                    if f.lower().endswith(".csv")
+                ]
+            )
+
+            if not yearly_files:
+                return {
+                    "error": f"No CSV files found in {data_dir}."
+                }
+
+            frames = []
+
+            for filename in yearly_files:
+                file_path = os.path.join(data_dir, filename)
+
+                year_df = pd.read_csv(
+                    file_path,
+                    sep=";",
+                    decimal=",",
+                    encoding="utf-8"
                 )
 
+                # Extract the year from the filename, e.g.
+                # world_happiness_2015.csv -> 2015
                 try:
-                    year_df = pd.read_csv(
-                        file_path,
-                        sep=';',
-                        decimal=',',
-                        encoding='utf-8'
+                    year = int(
+                        os.path.splitext(filename)[0].split("_")[-1]
                     )
-                    year_df['year'] = year
-                    res.append(year_df)
+                except ValueError:
+                    return {
+                        "error": f"Could not determine year from {filename}."
+                    }
 
-                except FileNotFoundError:
-                    return {"error": f"File {file_path} not found."}
+                year_df["year"] = year
+                frames.append(year_df)
 
-            if not res:
-                return {"error": "No yearly data files were loaded."}
-
-            df = pd.concat(res, ignore_index=True)
+            df = pd.concat(frames, ignore_index=True)
 
     except Exception as e:
         return {"error": f"Failed to load data: {str(e)}"}
@@ -217,53 +234,52 @@ if __name__ == "__main__":
 
     for query in queries:
         print(f"\n--- Query: {query} ---")
-        response = agent.run(query, reset=False, additional_args={"df": df})
+        response = agent.run(query, reset=False)
         print(response)
 
-    # My query 1
-    my_query_1 = "What's the correlation between social_support and happiness_score?"  
+    # Task 4 - Custom Query 1
+
+    my_query_1 = "What's the correlation between social_support and happiness_score?"
     response_1 = agent.run(my_query_1, reset=False)
     print(response_1)
-    # Comment: Did this trigger tool use, code generation, or both?
-    # Triggered tool use only. The agent called compute_correlation(col1='social_support',
-    # col2='happiness_score') directly in Step 1, got the result (pearson_r=0.7439, p_value=0.0),
-    # then called final_answer() in Step 2 with an interpretation. No raw code or custom logic
-    # was needed since this mapped exactly onto an existing tool.
-    # My query 2
-    my_query_2 = "Create a bar chart comparing the top 5 and bottom 5 countries by happiness_score in 2022."   
+
+    # This triggered tool use only. The agent used compute_correlation because
+    # the requested calculation was already available as a predefined tool.
+    
+    # Task 4 - Custom Query 2
+
+    my_query_2 = (
+        "Create a bar chart comparing the top 5 and bottom 5 countries "
+        "by happiness_score in 2022."
+)
+
     response_2 = agent.run(my_query_2, reset=False)
     print(response_2)
-    # Comment: Did this trigger tool use, code generation, or both?
-    # Triggered both tool use and code generation. The agent called get_top_n_countries()
-    # to retrieve country/score data, then wrote its own matplotlib code (plt.bar,
-    # color-coding top vs. bottom, saving the figure) since no tool covers bar chart
-    # generation. This query required several iterations to get right — the agent initially tried
-    # calling get_top_n_countries() twice with identical arguments to get both "top" and "bottom"
-    # results, then self-corrected by fetching all countries and sorting locally. It also hit and
-    # recovered from an internal dict-unpacking syntax restriction in the sandboxed interpreter.
+
+    # This triggered both tool use and code generation. The agent used
+    # get_top_n_countries to retrieve data and generated Python/matplotlib
+    # code to create the requested bar chart.
 
 # --- Reflection ---
 #
 # 1. In Query 3, how did the agent communicate whether the correlation was statistically
 # significant? Did it use the p-value correctly? What threshold did it apply?
-# The agent reported a Pearson correlation of 0.6313 and a p-value of 0.0, and concluded that
-# the correlation was statistically significant.
-# It used the p-value correctly because it was below the usual 0.05 significance threshold.
+#
+# The agent reported a Pearson correlation of 0.6313 and a p-value of 0.0.
+# It correctly concluded that the correlation was statistically significant
+# because the p-value was below the standard 0.05 threshold.
 #
 # 2. Did any of the agent's responses surprise you — either by being more capable than
-# you expected, or less? Describe one specific example.
-# Less capable: when asked to plot happiness_score by region, the agent kept trying to
-# access a variable called df directly, even though that variable doesn't exist in its
-# code execution environment by default. It took several failed attempts (and even a
-# hallucinated import) before I fixed this by passing df into the agent's execution
-# context directly via additional_args={"df": df} on each agent.run() call.
-# More capable: when a plot failed due to a macOS-specific threading error, the agent
-# diagnosed the issue on its own and added matplotlib.use('Agg') without being told.
-
+# expected, or less? Describe one specific example.
+#
+# I was surprised that the CodeAgent could generate custom matplotlib code when
+# the available tools did not directly support the requested plot. This made it
+# more flexible than a ToolCallingAgent for custom analysis and visualization tasks.
+#
 # 3. What one additional tool would make this agent meaningfully more useful?
 # Describe what it would do and what kind of question it would help the agent answer.
-# (You do not need to implement it.)
-# A get_yearly_trend(country, column) tool that returns a column's value for one country
-# across all years. This would let the agent answer trend questions directly, like
-# "how has Finland's happiness_score changed since 2015?", without needing to fetch the
-# whole dataset and filter it manually in code.
+#
+# A get_yearly_trend(country, column) tool would return a selected column's
+# values for one country across all years. It would help answer questions such
+# as "How has Finland's happiness_score changed since 2015?" without requiring
+# the agent to manually filter the full dataset.
