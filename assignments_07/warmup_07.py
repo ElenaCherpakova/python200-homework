@@ -90,7 +90,8 @@ def run_agent(user_prompt: str) -> str:
             celsius_temp = arguments['celsius']
             # In this example we only have one tool: celsius_to_fahrenheit
             if function_name == 'celsius_to_fahrenheit' and 'celsius' in arguments:
-                tool_result = celsius_to_fahrenheit(celsius_temp )
+                celsius_temp = arguments['celsius']
+                tool_result = celsius_to_fahrenheit(celsius_temp)
             else:
                  tool_result = f'Error: unknown tool {function_name}.'
 
