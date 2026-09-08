@@ -48,25 +48,86 @@ def combine_data(res):
     return combined_df
 
 
-@task(task_run_name='Clean Columns')
+@task(task_run_name="Clean Columns")
 def clean_columns(df):
     logger = get_run_logger()
-    logger.info('Cleaning column names...')
+    logger.info("Cleaning column names...")
 
     df = df.copy()
-    df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_')
 
-    if 'happiness_score' not in df.columns and 'ladder_score' in df.columns:
-        df['happiness_score'] = df['ladder_score']
-        logger.info("Created happiness_score from ladder_score.")
+    # Normalize column names
+    df.columns = (
+        df.columns
+        .str.strip()
+        .str.lower()
+        .str.replace(r"[^a-z0-9]+", "_", regex=True)
+        .str.strip("_")
+    )
 
-    if 'ladder_score' in df.columns and 'happiness_score' in df.columns:
-        df['happiness_score'] = df['happiness_score'].fillna(df['ladder_score'])
-        df = df.drop(columns=['ladder_score'])
-        logger.info("Combined happiness_score and ladder_score into one column.")
+    # Normalize country column
+    if "country" not in df.columns:
+        if "country_name" in df.columns:
+            df["country"] = df["country_name"]
+        elif "country_or_region" in df.columns:
+            df["country"] = df["country_or_region"]
 
-    logger.info('Column names cleaned successfully.')
+    # Normalize regional column
+    if "regional_indicator" not in df.columns:
+        if "region" in df.columns:
+            df["regional_indicator"] = df["region"]
+
+    # Normalize happiness score
+    if "happiness_score" not in df.columns:
+        df["happiness_score"] = pd.NA
+
+    if "ladder_score" in df.columns:
+        df["happiness_score"] = (
+            df["happiness_score"]
+            .fillna(df["ladder_score"])
+        )
+
+    if "score" in df.columns:
+        df["happiness_score"] = (
+            df["happiness_score"]
+            .fillna(df["score"])
+        )
+
+    # Remove old alternative column names
+    columns_to_drop = [
+        "ladder_score",
+        "score",
+        "country_name",
+        "country_or_region",
+        "region"
+    ]
+
+    df = df.drop(
+        columns=[col for col in columns_to_drop if col in df.columns]
+    )
+
+    # Make sure columns required by later tasks exist
+    required_columns = [
+        "country",
+        "regional_indicator",
+        "happiness_score",
+        "year"
+    ]
+
+    missing_columns = [
+        col for col in required_columns
+        if col not in df.columns
+    ]
+
+    if missing_columns:
+        raise ValueError(
+            f"Missing required columns after cleaning: {missing_columns}"
+        )
+
+    logger.info("Column names cleaned successfully.")
+    logger.info(f"Final columns: {list(df.columns)}")
+
     return df
+
 @task (task_run_name="Save Data")
 def save_data(df, output_file):
         logger = get_run_logger()
