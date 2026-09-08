@@ -20,28 +20,27 @@ print('OpenAI client created.')
 # --- Lesson 02 ---
 # Q1
 
-celsius_to_fahrenheit_schema = [
+celsius_to_fahrenheit_schema = {
+    "name": "celsius_to_fahrenheit",
+    "description": "Convert a Celsius temperature to Fahrenheit and return it as a formatted string.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "celsius": {
+                "type": "number",
+                "description": "The Celsius temperature to convert."
+            }
+        },
+        "required": ["celsius"]
+    }
+}
+
+tools = [
     {
         "type": "function",
-        "function": {
-            "name": "celsius_to_fahrenheit",
-            "description": "Convert a Celsius temperature to Fahrenheit and return it as a formatted string.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "celsius": {
-                        "type": "number",
-                        "description": "The Celsius temperature to convert."
-                    }
-                },
-                "required": ["celsius"]
-            }
-        }
+        "function": celsius_to_fahrenheit_schema
     }
 ]
-
-tools = [celsius_to_fahrenheit_schema]
-
 print("Tools list defined with one tool: celsius_to_fahrenheit")
 
 
