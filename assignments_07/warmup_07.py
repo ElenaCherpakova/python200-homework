@@ -62,7 +62,7 @@ def run_agent(user_prompt: str) -> str:
                     Use the tool celsius_to_fahrenheit whenever a user asks to convert Celsius to Fahrenheit.'''
                      
     messages = [{'role': 'system', 'content': SYSTEM_PROMPT},
-                {'role': 'user', 'content': user_prompt}];
+                {'role': 'user', 'content': user_prompt}]
     
     first_response = client.chat.completions.create(
         model='gpt-4.1-mini',
@@ -378,7 +378,7 @@ node_tools = {
     "summarize_columns": csv_backend.summarize_columns,
     "describe_column": csv_backend.describe_column,
     "plot_data": csv_backend.plot_data,
-    "compute_correlation": csv_backend.compute_correlation # Q4: new tool
+    "compute_correlation": csv_backend.compute_correlation # Q4: added correlation tool
 }
 
 tools_schema = [
