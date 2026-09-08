@@ -1,4 +1,5 @@
 import os
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,6 +10,7 @@ from sklearn.cluster import KMeans
 from sklearn.datasets import make_blobs
 from sklearn.metrics import mean_squared_error, r2_score
 
+os.makedirs("outputs", exist_ok=True)
 
 # Task 1: Load and Explore
 # Observation: the file uses semicolons (;) to separate fields, not commas.
@@ -168,55 +170,85 @@ print(f"R2: {r2}")
 # about 9% of the differences between students — the rest depends on other things.
 
 # Task 5: Build the Full Model
-feature_cols = ["failures", "Medu", "Fedu", "studytime", "higher", "schoolsup",
-                "internet", "sex", "freetime", "activities", "traveltime"]
+feature_cols = [
+    "age",
+    "Medu",
+    "Fedu",
+    "traveltime",
+    "studytime",
+    "failures",
+    "absences",
+    "freetime",
+    "goout",
+    "Walc",
+    "schoolsup",
+    "internet",
+    "higher",
+    "activities",
+    "sex"
+]
 X = df_nonzero[feature_cols].values
 y = df_nonzero["G3"].values
+
 model = LinearRegression()
+
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
+
 model.fit(X_train, y_train)
+
 y_pred = model.predict(X_test)
+
+# Test metrics
 r2_test = r2_score(y_test, y_pred)
 rmse_test = np.sqrt(mean_squared_error(y_test, y_pred))
+
+# Train metrics
 y_train_pred = model.predict(X_train)
 r2_train = r2_score(y_train, y_train_pred)
 
 print(f"Train R2: {r2_train}")
-print(f"Test R2:  {r2_test}")
+print(f"Test R2: {r2_test}")
 print(f"Test RMSE: {rmse_test}")
 
+print("\nCoefficients:")
 for name, coef in zip(feature_cols, model.coef_):
     print(f"{name:12s}: {coef:+.3f}")
     
-# Comments:
+# Coefficient interpretation:
+#
+# The largest positive coefficient is internet (+1.037), while the largest
+# negative coefficient is schoolsup (-2.263).
+#
+# The negative schoolsup coefficient is surprising. A likely explanation
+# is reverse causation: students who are already struggling may be more
+# likely to receive extra school support. This does not mean that support
+# causes lower grades.
+#
+# Failures (-0.800) is also strongly negative, while studytime (+0.311)
+# is positive, which are both consistent with expectations.
+#
+# Goout (-0.313) and Walc (-0.268) are negative, while freetime (+0.014)
+# has almost no effect in this model.
 
-# failures    : -1.145
-# Medu        : +0.083
-# Fedu        : +0.186
-# studytime   : +0.448
-# higher      : +0.610
-# schoolsup   : -2.062 - biggest effect, but negative. Likely reversed causation support is given to student
-# who are already struggle, not the cause of low grades. 
-# internet    : +0.834 - bigger boost that expected can be possibility of a proxy for household resources rather than a direct cause.
-# sex         : +0.453
-# freetime    : -0.042
-# activities  : -0.009
-# traveltime  : -0.112
 
-# Test R² went from 0.089 (failures alone) to 0.154 with 11 features which is
-# better, but still modest. These 11 features only explain about 15%
-# of why grades differ between students likely because we excluded
-# G1 and G2, which had by far the strongest correlation with G3
-# Train 0.175 vs Test 0.154 small gap, so no real overfitting.
-# The model generalizes about as well on new data as on training data,
-# just weakly overall.
+# Train vs. test:
+#
+# A small gap between train and test R2 suggests that the model is not
+# heavily overfitting. The full model should also perform substantially
+# better than the Task 4 baseline because it uses all 15 predictors.
 
-# --- Production features ---
-# KEEP: failures, schoolsup, higher, internet, studytime - biggest
-# effects and match EDA or have a plausible explanation.
-# DROP: activities, freetime - near-zero coefficients, not significant in EDA either.
+
+# Production decision:
+#
+# I would keep features with stronger predictive relationships, such as
+# failures, studytime, internet, schoolsup, goout, Walc, Medu, and Fedu.
+#
+# I would consider dropping features with very small coefficients, such as
+# freetime, absences, activities, higher, age, and traveltime. However,
+# this decision should be validated with additional model testing rather
+# than based on coefficient size alone.
 
 # Task 6: Evaluate and Summarize
 
