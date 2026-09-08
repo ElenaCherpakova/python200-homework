@@ -3,7 +3,6 @@ from openai import OpenAI
 import json
 import ollama
 
-
 load_dotenv()
 client = OpenAI()
 
