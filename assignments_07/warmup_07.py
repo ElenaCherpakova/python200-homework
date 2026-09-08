@@ -125,19 +125,15 @@ def run_agent(user_prompt: str) -> str:
         
 run_agent("Convert 100 degrees Celsius to Fahrenheit")
 
-# Comments: 
-# Yes, it should trigger the tool call because the user's request matches
-# the purpose of the celsius_to_fahrenheit tool, and the system prompt
-# instructs the model to use this tool for Celsius-to-Fahrenheit conversions.
-# tool_choice='auto' allows the model to decide whether to call the tool.
+# Q2 Prediction:
+# For the exact prompt run_agent("Convert 100 degrees Celsius to Fahrenheit"):
+# 1. Tool call prediction: YES — the celsius_to_fahrenheit tool should be called
+#    because the prompt asks for a Celsius-to-Fahrenheit conversion.
+# 2. API call prediction: 2 API calls — the first call asks the model whether to
+#    use the tool, and the second call sends the tool result back to the model
+#    to generate the final answer.
 
-# Two API calls are made:
-# 1. The first call sends the user's request to the model. The model decides
-# that the celsius_to_fahrenheit tool is needed and returns a tool call.
-# 2. Python executes the tool and adds its result to the messages.
-# The second call sends the tool result back to the model, which generates
-# the final answer for the user.
-
+run_agent("Convert 100 degrees Celsius to Fahrenheit")
 
 # Q3
 response_a = run_agent("What is 37 degrees Celsius in Fahrenheit?")
