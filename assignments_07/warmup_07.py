@@ -20,7 +20,7 @@ print('OpenAI client created.')
 # --- Lesson 02 ---
 # Q1
 
-tools = [
+celsius_to_fahrenheit_schema = [
     {
         "type": "function",
         "function": {
@@ -39,6 +39,8 @@ tools = [
         }
     }
 ]
+
+tools = [celsius_to_fahrenheit_schema]
 
 print("Tools list defined with one tool: celsius_to_fahrenheit")
 
