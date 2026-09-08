@@ -131,7 +131,7 @@ def run_agent(user_prompt: str) -> str:
 #    use the tool, and the second call sends the tool result back to the model
 #    to generate the final answer.
 
-run_agent("Convert 100 degrees Celsius to Fahrenheit")
+print(run_agent("Convert 100 degrees Celsius to Fahrenheit"))
 
 # Q3
 response_a = run_agent("What is 37 degrees Celsius in Fahrenheit?")
@@ -624,21 +624,13 @@ print(result)
 # average speed tends to decrease. The p-value is 0.0, showing this correlation is statistically significant.
 
 # Q6
+# Role explanation:
+# system - initial instructions that define the assistant's behavior
+# user - the user's request
+# assistant - the model's response or tool-call request
+# tool - the result returned by a tool
+
 print(json.dumps(messages, indent=2, default=str))
-
-for message in messages:
-    role = message["role"]
-    content = message['content']
-    print(f"Role: {role}")
-    print(f"Content: {content}")
-    print("-" * 20)
-    
-# Comments: 
-# system - the initial instructions that set up the LLM's behavior/persona (sent once, defines how the assistant should act)
-# user - the question or request from the human
-# assistant - the model's reply — this can be a normal answer, or a request to use a tool
-# tool - the result sent back after running a tool, so the model can use it to answer
-
 
 # Lesson 04
 # Q7
@@ -773,7 +765,8 @@ tool_agent = ToolCallingAgent(tools=TOOLS, model=model, instructions=SYSTEM_PROM
 # does and what its parameters mean.
 
 
-tool_agent.run("List the csv files in resources")
+tool_response = tool_agent.run("List the csv files in resources")
+print("ToolCallingAgent response:", tool_response)
 
 # Q8
 
@@ -806,15 +799,16 @@ code_agent = CodeAgent(
 prompt = "Load bike_commute.csv. Plot avg_heart_rate vs duration_min as a scatter plot with green dots."
 response_tool = tool_agent.run(prompt)
 response_code = code_agent.run(prompt, additional_args={"csv_manager": csv_manager})
+print("ToolCallingAgent response:", response_tool)
+print("CodeAgent response:", response_code)
 
-# For the exact scatter-plot prompt:
+# Comparison:
+# ToolCallingAgent can load the CSV and call plot_data, but plot_data
+# does not support choosing marker color, so it cannot produce the
+# requested green-dot scatter plot.
 #
-# ToolCallingAgent used plot_data, but plot_data does not have a parameter
-# for marker color. Therefore, the scatter plot used the default color
-# instead of the requested green dots.
-#
-# CodeAgent generated and executed matplotlib code, so it could set the
-# marker color to green and satisfy the styling request.
+# CodeAgent can generate and execute matplotlib code, so it can set
+# the marker color to green and produce the requested scatter plot.
 
 # Q9
 # 1. A ToolCallingAgent would be a better choice for a task such as loading CSV, 
