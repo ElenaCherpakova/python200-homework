@@ -15,8 +15,7 @@ data_dir = "happiness_project"
 years = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
 file_name = 'world_happiness'
 output_path = 'assignments_01/outputs/merged_happiness.csv'
-visual_output_path = 'outputs'
-
+visual_output_path = 'assignments_01/outputs'
 
 # Task 1: Load Multiple Years of Data
 @task(task_run_name="Load Data", retries=3, retry_delay_seconds=2)
