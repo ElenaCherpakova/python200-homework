@@ -246,9 +246,9 @@ def main():
     print(f"\n--- Custom Query 1 ---")
     print(response_1)
 
-    # Observation: This triggered tool use only. The agent used
-    # compute_correlation because the requested calculation was already
-    # available as a predefined tool.
+# Observation: The agent used the predefined compute_correlation tool
+# because this calculation was directly supported by an available tool.
+# No custom Python code was needed for this query.
 
     # Task 4: Custom Query 2
     my_query_2 = (
@@ -259,10 +259,11 @@ def main():
     response_2 = agent.run(my_query_2, reset=False)
     print(f"\n--- Custom Query 2 ---")
     print(response_2)
-
-    # Observation: This triggered both tool use and code generation.
-    # The agent used get_top_n_countries to retrieve the data and then
-    # generated matplotlib code to create the requested bar chart.
+    
+# Observation: The agent used the get_top_n_countries tool to retrieve
+# the top countries, then generated and executed Python/matplotlib code
+# to create the bar chart because the available tool did not directly
+# provide a top-and-bottom comparison chart.
 
 
 if __name__ == "__main__":
