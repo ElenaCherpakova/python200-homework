@@ -1,3 +1,5 @@
+from venv import logger
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -290,12 +292,13 @@ def summary_report(df, stats_summary, hypothesis_result, correllation_result):
     by_region = stats_summary['by_region']
     top_3 = by_region.head(3)
     bottom_3 = by_region.tail(3)
-    logger.info(f"Top 3 happinest regions:\n {top_3}")
-    logger.info(f"Least 3 happy regions:\n {bottom_3}");
-    # The result of the pre/post-2020 t-test in plain language.
+    logger.info(f"Top 3 regions by mean happiness score:\n{top_3}")
+    logger.info(f"Bottom 3 regions by mean happiness score:\n{bottom_3}")
     year_test = hypothesis_result['year_test']
-    logger.info(f"2019 vs 2020 happiness comparison: {year_test['interpretation']}")
-
+    logger.info(
+        f"2019 vs 2020 hypothesis test interpretation: "
+        f"{year_test['interpretation']}"
+    )
     # The variable most strongly correlated with happiness score (after Bonferroni correction).
     
     results = correllation_result['results']
@@ -308,23 +311,32 @@ def summary_report(df, stats_summary, hypothesis_result, correllation_result):
             significant_vars[col] = res
     
     if significant_vars:
-        strongest_var = max(significant_vars, key=lambda col: abs(significant_vars[col]['coefficient']))
+        strongest_var = max(
+            significant_vars,
+            key=lambda col: abs(significant_vars[col]['coefficient'])
+        )
         strongest_coef = significant_vars[strongest_var]['coefficient']
         strongest_p_value = significant_vars[strongest_var]['p_value']
+
         logger.info(
-            f"Strongest variable correlated with happiness_score (after Bonferroni correction): "
-            f"{strongest_var} (r={strongest_coef:.3f}, p={strongest_p_value:.6f})"
+            f"Strongest correlation after Bonferroni correction: "
+            f"{strongest_var} (r={strongest_coef:.3f}, "
+            f"p={strongest_p_value:.6f})"
         )
-    else:         
-        logger.info("No variables remained significantly correlated with happiness_score after Bonferroni correction.")
+    else:
+        strongest_var = None
+        logger.info(
+            "No variables remained significantly correlated with "
+            "happiness_score after Bonferroni correction."
+        )
 
     return {
         "total_countries": total_countries,
         "total_years": total_years,
         "top_3_region": top_3,
-        "bottom_3_region": bottom_3,        
+        "bottom_3_region": bottom_3,
         "year_test_interpretation": year_test["interpretation"],
-        "strongest_correlation": strongest_var if significant_vars else None,
+        "strongest_correlation": strongest_var,
     }
     
 @flow
