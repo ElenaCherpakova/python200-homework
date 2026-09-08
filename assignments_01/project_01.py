@@ -49,15 +49,21 @@ def combine_data(res):
 @task(task_run_name='Clean Columns')
 def clean_columns(df):
     logger = get_run_logger()
-    logger.info('Cleaning columns names...')
-    df.columns= (df.columns.str.strip().str.lower().str.replace(' ', '_'))
-    if 'happiness_score' not in df.columns:
+    logger.info('Cleaning column names...')
+
+    df = df.copy()
+    df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_')
+
+    if 'happiness_score' not in df.columns and 'ladder_score' in df.columns:
         df['happiness_score'] = df['ladder_score']
+        logger.info("Created happiness_score from ladder_score.")
+
     if 'ladder_score' in df.columns and 'happiness_score' in df.columns:
         df['happiness_score'] = df['happiness_score'].fillna(df['ladder_score'])
         df = df.drop(columns=['ladder_score'])
-        logger.info('Combine happiness_score and ladder_score into one columns')
-    logger.info('Columns names cleaned successfully.')
+        logger.info("Combined happiness_score and ladder_score into one column.")
+
+    logger.info('Column names cleaned successfully.')
     return df
 @task (task_run_name="Save Data")
 def save_data(df, output_file):
