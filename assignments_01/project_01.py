@@ -1,3 +1,5 @@
+from venv import logger
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,9 +14,8 @@ import os
 data_dir = "happiness_project"
 years = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
 file_name = 'world_happiness'
-output_path = 'outputs/merged_happiness.csv'
-visual_output_path = 'outputs'
-
+output_path = 'assignments_01/outputs/merged_happiness.csv'
+visual_output_path = 'assignments_01/outputs'
 
 # Task 1: Load Multiple Years of Data
 @task(task_run_name="Load Data", retries=3, retry_delay_seconds=2)
@@ -46,19 +47,86 @@ def combine_data(res):
     return combined_df
 
 
-@task(task_run_name='Clean Columns')
+@task(task_run_name="Clean Columns")
 def clean_columns(df):
     logger = get_run_logger()
-    logger.info('Cleaning columns names...')
-    df.columns= (df.columns.str.strip().str.lower().str.replace(' ', '_'))
-    if 'happiness_score' not in df.columns:
-        df['happiness_score'] = df['ladder_score']
-    if 'ladder_score' in df.columns and 'happiness_score' in df.columns:
-        df['happiness_score'] = df['happiness_score'].fillna(df['ladder_score'])
-        df = df.drop(columns=['ladder_score'])
-        logger.info('Combine happiness_score and ladder_score into one columns')
-    logger.info('Columns names cleaned successfully.')
+    logger.info("Cleaning column names...")
+
+    df = df.copy()
+
+    # Normalize column names
+    df.columns = (
+        df.columns
+        .str.strip()
+        .str.lower()
+        .str.replace(r"[^a-z0-9]+", "_", regex=True)
+        .str.strip("_")
+    )
+
+    # Normalize country column
+    if "country" not in df.columns:
+        if "country_name" in df.columns:
+            df["country"] = df["country_name"]
+        elif "country_or_region" in df.columns:
+            df["country"] = df["country_or_region"]
+
+    # Normalize regional column
+    if "regional_indicator" not in df.columns:
+        if "region" in df.columns:
+            df["regional_indicator"] = df["region"]
+
+    # Normalize happiness score
+    if "happiness_score" not in df.columns:
+        df["happiness_score"] = pd.NA
+
+    if "ladder_score" in df.columns:
+        df["happiness_score"] = (
+            df["happiness_score"]
+            .fillna(df["ladder_score"])
+        )
+
+    if "score" in df.columns:
+        df["happiness_score"] = (
+            df["happiness_score"]
+            .fillna(df["score"])
+        )
+
+    # Remove old alternative column names
+    columns_to_drop = [
+        "ladder_score",
+        "score",
+        "country_name",
+        "country_or_region",
+        "region"
+    ]
+
+    df = df.drop(
+        columns=[col for col in columns_to_drop if col in df.columns]
+    )
+
+    # Make sure columns required by later tasks exist
+    required_columns = [
+        "country",
+        "regional_indicator",
+        "happiness_score",
+        "year"
+    ]
+
+    missing_columns = [
+        col for col in required_columns
+        if col not in df.columns
+    ]
+
+    if missing_columns:
+        raise ValueError(
+            f"Missing required columns after cleaning: {missing_columns}"
+        )
+
+    logger.info("Column names cleaned successfully.")
+    logger.info(f"Final columns: {list(df.columns)}")
+
     return df
+
 @task (task_run_name="Save Data")
 def save_data(df, output_file):
         logger = get_run_logger()
@@ -284,12 +352,13 @@ def summary_report(df, stats_summary, hypothesis_result, correllation_result):
     by_region = stats_summary['by_region']
     top_3 = by_region.head(3)
     bottom_3 = by_region.tail(3)
-    logger.info(f"Top 3 happinest regions:\n {top_3}")
-    logger.info(f"Least 3 happy regions:\n {bottom_3}");
-    # The result of the pre/post-2020 t-test in plain language.
+    logger.info(f"Top 3 regions by mean happiness score:\n{top_3}")
+    logger.info(f"Bottom 3 regions by mean happiness score:\n{bottom_3}")
     year_test = hypothesis_result['year_test']
-    logger.info(f"2019 vs 2020 happiness comparison: {year_test['interpretation']}")
-
+    logger.info(
+        f"2019 vs 2020 hypothesis test interpretation: "
+        f"{year_test['interpretation']}"
+    )
     # The variable most strongly correlated with happiness score (after Bonferroni correction).
     
     results = correllation_result['results']
@@ -302,23 +371,32 @@ def summary_report(df, stats_summary, hypothesis_result, correllation_result):
             significant_vars[col] = res
     
     if significant_vars:
-        strongest_var = max(significant_vars, key=lambda col: abs(significant_vars[col]['coefficient']))
+        strongest_var = max(
+            significant_vars,
+            key=lambda col: abs(significant_vars[col]['coefficient'])
+        )
         strongest_coef = significant_vars[strongest_var]['coefficient']
         strongest_p_value = significant_vars[strongest_var]['p_value']
+
         logger.info(
-            f"Strongest variable correlated with happiness_score (after Bonferroni correction): "
-            f"{strongest_var} (r={strongest_coef:.3f}, p={strongest_p_value:.6f})"
+            f"Strongest correlation after Bonferroni correction: "
+            f"{strongest_var} (r={strongest_coef:.3f}, "
+            f"p={strongest_p_value:.6f})"
         )
-    else:         
-        logger.info("No variables remained significantly correlated with happiness_score after Bonferroni correction.")
+    else:
+        strongest_var = None
+        logger.info(
+            "No variables remained significantly correlated with "
+            "happiness_score after Bonferroni correction."
+        )
 
     return {
         "total_countries": total_countries,
         "total_years": total_years,
         "top_3_region": top_3,
-        "bottom_3_region": bottom_3,        
+        "bottom_3_region": bottom_3,
         "year_test_interpretation": year_test["interpretation"],
-        "strongest_correlation": strongest_var if significant_vars else None,
+        "strongest_correlation": strongest_var,
     }
     
 @flow

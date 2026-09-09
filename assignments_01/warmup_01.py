@@ -17,13 +17,14 @@ data = {
 df = pd.DataFrame(data)
 # --- Pandas
 # --- Pandas Q1 ---
-# --- first three rows ---
-print(f"First three rows: {df.head(3)}")
-# ---  the shape ---
-print(f"Shape: {df.shape}")
-# --- data types of each column
-print(f"Data types of each column: {df.dtypes}")
+print("Pandas Q1 - First three rows:")
+print(df.head(3))
 
+print("\nPandas Q1 - Shape:")
+print(df.shape)
+
+print("\nPandas Q1 - Data types:")
+print(df.dtypes)
 # --- Pandas Q2 ---
 filtered_df = df.loc[ (df['passed']) & (df['grade'] > 80) ]
 print(f"Students who passed and have grade > 80:\n {filtered_df}")
@@ -159,7 +160,7 @@ group_a = [55, 60, 63, 70, 68, 62, 58, 65]
 group_b = [75, 80, 78, 90, 85, 79, 82, 88]
 data_to_compare = [group_a, group_b]
 fig, ax = plt.subplots(figsize=(8, 6))
-ax.boxplot(data_to_compare, tick_labels=['Group A', 'Group B'])
+ax.boxplot(data_to_compare, labels=['Group A', 'Group B'])
 ax.set_title('Score Comparison')
 ax.set_ylabel('Values')
 ax.grid(axis='y', linestyle='--', alpha=0.7)
