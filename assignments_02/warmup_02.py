@@ -127,6 +127,7 @@ print("smoker coefficient: ", model_full.coef_[1])
 # This is a huge improvement, confirming that cost depends heavily on smoking status,
 # not just age.
 
+
 y_pred_full = model_full.predict(X_test)
 plt.scatter(y_pred_full, y_test)
 plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color="black")
