@@ -20,27 +20,28 @@ print('OpenAI client created.')
 # --- Lesson 02 ---
 # Q1
 
+celsius_to_fahrenheit_schema = {
+    "name": "celsius_to_fahrenheit",
+    "description": "Convert a Celsius temperature to Fahrenheit and return it as a formatted string.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "celsius": {
+                "type": "number",
+                "description": "The Celsius temperature to convert."
+            }
+        },
+        "required": ["celsius"]
+    }
+}
+
 tools = [
     {
-        'type': 'function',
-        'function': {
-            'name': 'celsius_to_fahrenheit',
-            'description': 'Convert a Celsius temperature to Fahrenheit and return it as a formatted string',
-            'parameters': {
-                'type': 'object',
-                'properties': {
-                    'celsius': {
-                        'type':'number',
-                        'description': 'The temperature is Celsius to convert'
-                    }
-                },
-                'required': ['celsius']
-            }
-        }
+        "type": "function",
+        "function": celsius_to_fahrenheit_schema
     }
 ]
-
-print('Tools list defined with one tool: celsius_to_fahrenheit')
+print("Tools list defined with one tool: celsius_to_fahrenheit")
 
 
 def celsius_to_fahrenheit(celsius: float) -> str:
@@ -49,10 +50,10 @@ def celsius_to_fahrenheit(celsius: float) -> str:
     return f"{celsius}°C is {fahrenheit}°F"
 
 
-celcisus = [0, 100,-40]
-for c in celcisus:
-    output = celsius_to_fahrenheit(c)
-    print(output)
+# Direct calls required by the exercise
+print(celsius_to_fahrenheit(0))
+print(celsius_to_fahrenheit(100))
+print(celsius_to_fahrenheit(-40))
     
 # Q2
     
@@ -61,7 +62,7 @@ def run_agent(user_prompt: str) -> str:
                     Use the tool celsius_to_fahrenheit whenever a user asks to convert Celsius to Fahrenheit.'''
                      
     messages = [{'role': 'system', 'content': SYSTEM_PROMPT},
-                {'role': 'user', 'content': user_prompt}];
+                {'role': 'user', 'content': user_prompt}]
     
     first_response = client.chat.completions.create(
         model='gpt-4.1-mini',
@@ -89,7 +90,8 @@ def run_agent(user_prompt: str) -> str:
             celsius_temp = arguments['celsius']
             # In this example we only have one tool: celsius_to_fahrenheit
             if function_name == 'celsius_to_fahrenheit' and 'celsius' in arguments:
-                tool_result = celsius_to_fahrenheit(celsius_temp )
+                celsius_temp = arguments['celsius']
+                tool_result = celsius_to_fahrenheit(celsius_temp)
             else:
                  tool_result = f'Error: unknown tool {function_name}.'
 
@@ -123,32 +125,28 @@ def run_agent(user_prompt: str) -> str:
      # If there were no tool calls, the first response was already the final answer
     return first_message.content or ''
         
-run_agent("Convert 100 degrees Celsius to Fahrenheit")
+# Q2 Prediction:
+# For the exact prompt run_agent("Convert 100 degrees Celsius to Fahrenheit"):
+# 1. Tool call prediction: YES — the celsius_to_fahrenheit tool should be called
+#    because the prompt asks for a Celsius-to-Fahrenheit conversion.
+# 2. API call prediction: 2 API calls — the first call asks the model whether to
+#    use the tool, and the second call sends the tool result back to the model
+#    to generate the final answer.
 
-# Comments: 
-# Yes, it should trigger the tool call because the user's request matches
-# the purpose of the celsius_to_fahrenheit tool, and the system prompt
-# instructs the model to use this tool for Celsius-to-Fahrenheit conversions.
-# tool_choice='auto' allows the model to decide whether to call the tool.
-
-# Two API calls are made:
-# 1. The first call sends the user's request to the model. The model decides
-# that the celsius_to_fahrenheit tool is needed and returns a tool call.
-# 2. Python executes the tool and adds its result to the messages.
-# The second call sends the tool result back to the model, which generates
-# the final answer for the user.
-
+print(run_agent("Convert 100 degrees Celsius to Fahrenheit"))
 
 # Q3
 response_a = run_agent("What is 37 degrees Celsius in Fahrenheit?")
 print("Response A:", response_a)
-# A tool was called because the user explicitly asked to convert a temperature from celsius to fahrenheit, which 
-# matches the purpose of the celsius_to_fahrenheit tool. The model passes 37 as the celsius argument.
+# Tool used: YES. The user explicitly asks for a Celsius-to-Fahrenheit
+# conversion, so the celsius_to_fahrenheit tool is appropriate.
+# The model should pass 37 as the celsius argument.
 
 response_b = run_agent("What is the boiling point of water in plain English?")
 print("Response B:", response_b)
-# No tool was called because the user is asking for a general explanation of the boiling point in plain English.
-# The celsius_to_fahrenheit tool is not needed, so the model answers directly.
+# Tool used: NO. The user asks for a general explanation of the boiling
+# point of water, not a Celsius-to-Fahrenheit conversion, so the
+# celsius_to_fahrenheit tool is not needed.
 
 # --- Lesson 03 ---
 # Q4
@@ -381,7 +379,7 @@ node_tools = {
     "summarize_columns": csv_backend.summarize_columns,
     "describe_column": csv_backend.describe_column,
     "plot_data": csv_backend.plot_data,
-    "compute_correlation": csv_backend.compute_correlation # Q4: new tool
+    "compute_correlation": csv_backend.compute_correlation # Q4: added correlation tool
 }
 
 tools_schema = [
@@ -628,21 +626,13 @@ print(result)
 # average speed tends to decrease. The p-value is 0.0, showing this correlation is statistically significant.
 
 # Q6
+# Role explanation:
+# system - initial instructions that define the assistant's behavior
+# user - the user's request
+# assistant - the model's response or tool-call request
+# tool - the result returned by a tool
+
 print(json.dumps(messages, indent=2, default=str))
-
-for message in messages:
-    role = message["role"]
-    content = message['content']
-    print(f"Role: {role}")
-    print(f"Content: {content}")
-    print("-" * 20)
-    
-# Comments: 
-# system - the initial instructions that set up the LLM's behavior/persona (sent once, defines how the assistant should act)
-# user - the question or request from the human
-# assistant - the model's reply — this can be a normal answer, or a request to use a tool
-# tool - the result sent back after running a tool, so the model can use it to answer
-
 
 # Lesson 04
 # Q7
@@ -777,7 +767,8 @@ tool_agent = ToolCallingAgent(tools=TOOLS, model=model, instructions=SYSTEM_PROM
 # does and what its parameters mean.
 
 
-tool_agent.run("List the csv files in resources")
+tool_response = tool_agent.run("List the csv files in resources")
+print("ToolCallingAgent response:", tool_response)
 
 # Q8
 
@@ -810,23 +801,16 @@ code_agent = CodeAgent(
 prompt = "Load bike_commute.csv. Plot avg_heart_rate vs duration_min as a scatter plot with green dots."
 response_tool = tool_agent.run(prompt)
 response_code = code_agent.run(prompt, additional_args={"csv_manager": csv_manager})
+print("ToolCallingAgent response:", response_tool)
+print("CodeAgent response:", response_code)
 
-# Comments:
-# For the prompt "Load bike_commute.csv. Plot avg_heart_rate vs duration_min as a
-# scatter plot with green dots.":
+# Comparison:
+# ToolCallingAgent can load the CSV and call plot_data, but plot_data
+# does not support choosing marker color, so it cannot produce the
+# requested green-dot scatter plot.
 #
-# - response_tool (ToolCallingAgent): called plot_data(y='avg_heart_rate',
-#   x='duration_min', plot_type='scatter'), but plot_data has no way to set marker
-#   color, so the scatter plot was produced with the default color — the "green dots"
-#   part of the request was ignored/not honored.
-#
-# - response_code (CodeAgent): recognized that styling wasn't supported by plot_data,
-#   and instead wrote its own matplotlib code (plt.scatter(..., color='green')) to
-#   fulfill the exact request, producing a scatter plot with green dots as asked.
-#
-# This shows the practical difference: ToolCallingAgent is limited to whatever the
-# tool's parameters expose, while CodeAgent can go beyond the tool's interface when
-# the task calls for something the tools don't directly support.
+# CodeAgent can generate and execute matplotlib code, so it can set
+# the marker color to green and produce the requested scatter plot.
 
 # Q9
 # 1. A ToolCallingAgent would be a better choice for a task such as loading CSV, 
