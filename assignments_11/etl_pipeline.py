@@ -19,7 +19,11 @@ print("Key loaded:", bool(os.getenv("OPENAI_API_KEY")))
 print("Key prefix:", os.getenv("OPENAI_API_KEY", "")[:7])
 
 # Extract task
-params = {
+
+@task(retries=2, retry_delay_seconds=10)
+def extract() -> list[dict]:
+    url = "https://archive-api.open-meteo.com/v1/archive"
+    params = {
     "latitude": 55.7558,
     "longitude": 37.6173,
     "start_date": "2023-01-01",
@@ -32,8 +36,6 @@ params = {
     ],
     "timezone": "Europe/Moscow",
 }
-@task(retries=2, retry_delay_seconds=10)
-def extract(url: str) -> list[dict]:
     response = requests.get(url, params=params)
     response.raise_for_status() 
     
@@ -160,9 +162,9 @@ def load_enriched(table_name, enrichment_records) -> list:
 # Flow
 @flow(log_prints=True)
 def etl_pipeline():     
-    data = extract("https://archive-api.open-meteo.com/v1/archive")
-    loaded_raw_data = load_raw("weather_raw", data)
-    transformed_data = transform("weather_enriched", loaded_raw_data)
+    raw_data = extract()
+    load_raw("weather_raw", raw_data)
+    transformed_data = transform("weather_enriched", raw_data)
     enriched_data = load_enriched("weather_enriched", transformed_data)
     print("ETL pipeline completed successfully.")
 
