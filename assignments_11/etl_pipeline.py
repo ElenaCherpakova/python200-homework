@@ -140,7 +140,7 @@ def transform(raw_records):
             summary = "Recommendation unavailable."
 
         record["llm_summary"] = summary
-        if(i + 1) % 50 == 0:
+        if (i + 1) % 50 == 0:
             print(f"  Enriched {i + 1} / {len(enrichment_records)} records...")
         
     return enrichment_records
