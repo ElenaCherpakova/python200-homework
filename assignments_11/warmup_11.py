@@ -43,7 +43,7 @@ def call_api():
 # Q3
 from prefect.logging import get_run_logger
 
-@task()
+@task
 def load_enriched(enrichment_records: list) -> None:
     logger = get_run_logger()
     logger.info(f"Number of enrichment records upserted: {len(enrichment_records)}")

@@ -83,7 +83,7 @@ def validate_summary(text):
     if len(sentences) > 1:
         return None
     return text
-@task 
+@task(retries=2, retry_delay_seconds=5)
 def transform(table_name, raw_records):
     enrichment_response = supabase.table(table_name).select("date").execute()
     already_done = {row["date"] for row in enrichment_response.data}
