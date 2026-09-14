@@ -51,9 +51,9 @@ def extract() -> list[dict]:
 
 # load_raw task
 @task(retries=2, retry_delay_seconds=5)     
-def load_raw(table_name, data: list[dict]) -> list:
+def load_raw(data: list[dict]) -> list:
     
-    response = supabase.table(table_name).upsert(data, on_conflict="date").execute()
+    response = supabase.table("weather_raw").upsert(data, on_conflict="date").execute()
     print(f"Upserted {len(response.data)} raw records into weather_raw")
     return response.data
 
@@ -84,8 +84,8 @@ def validate_summary(text):
         return None
     return text
 @task(retries=2, retry_delay_seconds=5)
-def transform(table_name, raw_records):
-    enrichment_response = supabase.table(table_name).select("date").execute()
+def transform(raw_records):
+    enrichment_response = supabase.table("weather_enriched").select("date").execute()
     already_done = {row["date"] for row in enrichment_response.data}
     to_classify = [row for row in raw_records if row["date"] not in already_done]
     print(f"Records to process: {len(to_classify)} (skipping {len(already_done)} already enriched)")
@@ -134,7 +134,7 @@ def transform(table_name, raw_records):
                 max_tokens=100,
             )
             raw_summary = response.choices[0].message.content
-            summary = validate_summary(raw_summary) or "Recommendation unavailable"
+            summary = validate_summary(raw_summary) or "Recommendation unavailable."
         except Exception as e:
             print(f"  API error on {record['date']}: {e}")
             summary = "Recommendation unavailable."
@@ -147,13 +147,13 @@ def transform(table_name, raw_records):
 
 # load_enriched task
 @task(retries=2, retry_delay_seconds=5)
-def load_enriched(table_name, enrichment_records) -> list:
+def load_enriched(enrichment_records) -> list:
     if not enrichment_records:
         print("Nothing to load")
         return []
     
-    df_response = supabase.table(table_name).upsert(enrichment_records, on_conflict="date").execute()
-    print(f"Upserted {len(df_response.data)} rows into {table_name}")
+    df_response = supabase.table("weather_enriched").upsert(enrichment_records, on_conflict="date").execute()
+    print(f"Upserted {len(df_response.data)} rows into weather_enriched")
 
     return df_response.data
     
@@ -163,9 +163,9 @@ def load_enriched(table_name, enrichment_records) -> list:
 @flow(log_prints=True)
 def etl_pipeline():     
     raw_data = extract()
-    load_raw("weather_raw", raw_data)
-    transformed_data = transform("weather_enriched", raw_data)
-    enriched_data = load_enriched("weather_enriched", transformed_data)
+    load_raw(raw_data)
+    transformed_data = transform(raw_data)
+    enriched_data = load_enriched(transformed_data)
     print("ETL pipeline completed successfully.")
 
     
